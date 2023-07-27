@@ -1,0 +1,1 @@
+# OTUS.Common-project
