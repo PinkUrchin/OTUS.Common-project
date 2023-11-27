@@ -14,7 +14,7 @@ namespace otus
     {
         public Form1()
         {
-            InitializeComponent();
+            InitializeComponent(); 
         }
     }
 }
