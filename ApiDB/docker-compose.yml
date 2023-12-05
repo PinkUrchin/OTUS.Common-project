@@ -1,0 +1,56 @@
+version: "3.5"
+
+networks:
+  otus_default:
+    driver: bridge
+    ipam:
+        driver: default
+        config:
+            - subnet: 172.16.0.0/28
+    
+services:     
+    rmq:
+        hostname: 'rmq'
+        image: rabbitmq:3-management
+        restart: always
+        volumes:
+            - rmq:/var/lib/rabbitmq
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        networks:
+            - otus_default
+        environment:
+            - AGENT_LOGIN=guest
+            - AGENT_PASSWORD=guest
+    postgres:
+        hostname: 'postgres'
+        image: 'postgres'
+        restart: always
+        volumes:
+            - db_vol:/var/lib/db_vol
+        ports:
+            - '5432:5432'
+        networks:
+            - otus_default
+        environment:
+            - POSTGRES_PASSWORD=postgres 
+            - POSTGRESS_USER=postgres
+    pgadmin:
+        hostname: 'pgadmin'
+        image: 'dpage/pgadmin4'
+        restart: always
+        networks:
+            - otus_default
+        ports:
+            - '82:80'
+        environment:
+            - PGADMIN_DEFAULT_EMAIL=guest@gmail.com
+            - PGADMIN_DEFAULT_PASSWORD=guest
+volumes:
+    rmq:
+       driver: local
+    db_vol:
+       driver: local
+    
+

@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <Reference Include="yeqon">
-      <HintPath>..\..\ylib\yeqon\bin\Debug\net5.0\yeqon.dll</HintPath>
+      <HintPath>..\..\..\Phoenix\NewPhoenix\ylib\yeqon\bin\Debug\net5.0\yeqon.dll</HintPath>
     </Reference>
   </ItemGroup>
 
