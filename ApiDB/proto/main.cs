@@ -6,35 +6,15 @@ namespace Protocol.Common
     public static class Actions
     {
         public static readonly string GetListDocuments = "GetListDocuments";
+        public static readonly string GetDocumentById = "GetDocumentById";
+        public static readonly string CreateDocument = "CreateDocument";
+        public static readonly string DeleteDocumentById = "DeleteDocumentById";
+        public static readonly string CreateFigure = "CreateFigure";
+        public static readonly string UpdateFigure = "UpdateFigure";
+        public static readonly string DeleteFigure = "DeleteFigure";
     }
-    public interface IRequest
-    {
-        [JsonProperty("Action")]
-        public string Action { get; set; }
-    }
-    public class Request: IRequest
-    {
-        [JsonProperty("Action")]
-        public string Action { get; set; }
-        public Request(string action_name)
-        {
-            Action = action_name;
-        }
-        public static IRequest ReadRequest(string data)
-        {
-            return JsonConvert.DeserializeObject<IRequest>(data, new RequestConverter());
-        }
-    }
-    public interface IGetListDocuments : IRequest
-    {
-        string UserName { get; set; }
-    }
-    public class GetListDocumentsRequest : Request, IGetListDocuments
-    {
-        [JsonProperty("user_name")]
-        public string UserName { get; set; }
-        public GetListDocumentsRequest() : base(Actions.GetListDocuments) { }
-    }
+  
+  
     public static class RequestMaker
     {
         private delegate IRequest Maker();
@@ -73,23 +53,5 @@ namespace Protocol.Common
         }
     }
 
-    public class DocumentHeader
-    {
-        [JsonProperty("Id")]
-        public int Id { get; set; }
-        [JsonProperty("Title")]
-        public string Title { get; set; }
-        [JsonProperty("UserName")]
-        public string UserName { get; set; }
-    }
-
-    public class DocumentList
-    {
-        [JsonProperty("Documents")]
-        public List<DocumentHeader> Documents { set; get; }
-        public DocumentList()
-        {
-            Documents = new List<DocumentHeader>();
-        }
-    }
+    
 }
