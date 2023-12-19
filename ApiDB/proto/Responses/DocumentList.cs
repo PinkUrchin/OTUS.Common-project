@@ -7,15 +7,7 @@ using System.Threading.Tasks;
 
 namespace Protocol.Common
 {
-    public class DocumentHeader
-    {
-        [JsonProperty("Id")]
-        public int Id { get; set; }
-        [JsonProperty("Title")]
-        public string Title { get; set; }
-        [JsonProperty("UserName")]
-        public string UserName { get; set; }
-    }
+   
 
     public class DocumentList
     {

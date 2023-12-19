@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using protocol.Requests;
 using Protocol.Common;
 
 namespace apidb
@@ -25,6 +27,51 @@ namespace apidb
             return Task.FromResult(JsonConvert.SerializeObject(lst));
         }
     }
+    public class CreateDocumentHandler : IHandler
+    {
+        public Task<string> HandleRequest(IRequest req)
+        {
+            var request = req as ICreateDocumentRequest;
+            //пока загулшка
+            var result = new Document()
+            {
+                Header = new DocumentHeader() { Id = 1, Title = request.DocumentName, UserName = request.UserName },
+                Body = new List<Primitive>()
+            };
+            return Task.FromResult(JsonConvert.SerializeObject(result));
+        }
+    }
+    public class DeleteDocumentHandler : IHandler
+    {
+        public Task<string> HandleRequest(IRequest req)
+        {
+            var request = req as IDeleteDocumentByIdRequest;
+            var result = JsonConvert.SerializeObject(new StatusResponse() { Status = Status.Success, Description = "ok" });
+            return Task.FromResult(JsonConvert.SerializeObject(result));
+        }
+    }
+    public class DeleteFigureHandler : IHandler
+    {
+        public Task<string> HandleRequest(IRequest req)
+        {
+            var request = req as IDeleteFigureRequest;
+            var jobj = JObject.Parse(request?.FigureInfo);
+            var result = JsonConvert.SerializeObject(new StatusResponse() { Status = Status.Success, Description = "ok" });
+            return Task.FromResult(JsonConvert.SerializeObject(result));
+        }
+    }
+    public class GetDocumentByIdRequestHandler : IHandler
+    {
+        public Task<string> HandleRequest(IRequest req)
+        {
+            var request = req as IGetDocumentByIdRequest;
+            var result = JsonConvert.SerializeObject(new Document()
+            {
+                Header = new DocumentHeader() { Id = request.DocumentId },
+                Body = new List<Primitive>() }) ;
+            return Task.FromResult(JsonConvert.SerializeObject(result));
+        }
+    }
     public class RequestHandler
     {
 
@@ -34,7 +81,11 @@ namespace apidb
         {
             m_handlers = new Dictionary<string, IHandler>
             {
-                {Actions.GetListDocuments, new DocumentListHandler() }
+                {Actions.GetListDocuments, new DocumentListHandler() },
+                {Actions.DeleteDocumentById, new DeleteDocumentHandler() },
+                {Actions.CreateDocument, new CreateDocumentHandler() },
+                {Actions.DeleteFigure, new DeleteFigureHandler() }
+
             };
 
         }
