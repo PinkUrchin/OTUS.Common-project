@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using protocol.Requests;
 using Protocol.Common;
+using UfaService.Model;
 
 namespace apidb
 {
@@ -16,19 +17,30 @@ namespace apidb
     }
     public class DocumentListHandler: IHandler
     {
+        PostgresContext m_dbcontext;
+        public DocumentListHandler(PostgresContext dbcontext)
+        {
+            m_dbcontext = dbcontext;
+        }
         public Task<string> HandleRequest(IRequest req)
         {
             //забираем из БД
             //пока загулшка
-            var lst = new DocumentList();
-            lst.Documents.Add(new DocumentHeader() { Id = 1, Title = "Document 1", UserName = "SemenovaMN" });
-            lst.Documents.Add(new DocumentHeader() { Id = 2, Title = "Document 2", UserName = "SemenovaMN" });
-            lst.Documents.Add(new DocumentHeader() { Id = 3, Title = "Document 3", UserName = "SemenovaMN" });
-            return Task.FromResult(JsonConvert.SerializeObject(lst));
+            var lst1 = m_dbcontext.dw_documents.ToList();
+            //var lst = new DocumentList();
+            //lst.Documents.Add(new DocumentHeader() { Id = 1, Title = "Document 1", UserName = "SemenovaMN" });
+            //lst.Documents.Add(new DocumentHeader() { Id = 2, Title = "Document 2", UserName = "SemenovaMN" });
+            //lst.Documents.Add(new DocumentHeader() { Id = 3, Title = "Document 3", UserName = "SemenovaMN" });
+            return Task.FromResult(JsonConvert.SerializeObject(lst1));
         }
     }
     public class CreateDocumentHandler : IHandler
     {
+        PostgresContext m_dbcontext;
+        public CreateDocumentHandler(PostgresContext dbcontext)
+        {
+            m_dbcontext = dbcontext;
+        }
         public Task<string> HandleRequest(IRequest req)
         {
             var request = req as ICreateDocumentRequest;
@@ -74,16 +86,16 @@ namespace apidb
     }
     public class RequestHandler
     {
-
+        private PostgresContext m_dbcontext = new PostgresContext();
         private readonly Dictionary<string, IHandler> m_handlers;
 
         public RequestHandler()
         {
             m_handlers = new Dictionary<string, IHandler>
             {
-                {Actions.GetListDocuments, new DocumentListHandler() },
+                {Actions.GetListDocuments, new DocumentListHandler(m_dbcontext) },
                 {Actions.DeleteDocumentById, new DeleteDocumentHandler() },
-                {Actions.CreateDocument, new CreateDocumentHandler() },
+                {Actions.CreateDocument, new CreateDocumentHandler(m_dbcontext) },
                 {Actions.DeleteFigure, new DeleteFigureHandler() }
 
             };
