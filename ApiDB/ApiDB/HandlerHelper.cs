@@ -26,12 +26,14 @@ namespace apidb
         {
             //забираем из БД
             //пока загулшка
-            var lst1 = m_dbcontext.dw_documents.ToList();
-            //var lst = new DocumentList();
+            var lst = m_dbcontext.dw_documents.ToList();
+            var result = new DocumentList();
+            foreach (var doc in lst)
+                result.Documents.Add(new DocumentHeader() { Id = doc.Id, Title = doc.Name, UserName = doc.CreateAuthor});
             //lst.Documents.Add(new DocumentHeader() { Id = 1, Title = "Document 1", UserName = "SemenovaMN" });
             //lst.Documents.Add(new DocumentHeader() { Id = 2, Title = "Document 2", UserName = "SemenovaMN" });
             //lst.Documents.Add(new DocumentHeader() { Id = 3, Title = "Document 3", UserName = "SemenovaMN" });
-            return Task.FromResult(JsonConvert.SerializeObject(lst1));
+            return Task.FromResult(JsonConvert.SerializeObject(result));
         }
     }
     public class CreateDocumentHandler : IHandler
