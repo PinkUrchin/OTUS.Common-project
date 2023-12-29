@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Markup;
+using XamlVectorGraphicEditor;
 
 public partial class MainWindow : Window
 {
@@ -240,6 +241,40 @@ public partial class MainWindow : Window
         {
             XamlWriter.Save(MainCanvas.Children, System.IO.File.CreateText(dlg.FileName));
         }
+    }
+
+    private void btnSelectDocument_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new SelectDocument();
+        dlg.Owner = this;
+        if (!dlg.ShowDialog() ?? false)
+            return;
+
+        LoadDocument();
+    }
+
+    private bool _shown;
+    protected override void OnContentRendered(EventArgs e)
+    {
+        base.OnContentRendered(e);
+
+        if (_shown)
+            return;
+
+        _shown = true;
+
+        var dlg = new SelectDocument();
+        dlg.Owner = this;
+
+        if (!dlg.ShowDialog() ?? false)
+            Close();
+
+        LoadDocument();
+    }
+
+    private void LoadDocument()
+    {
+        //
     }
 }
 
