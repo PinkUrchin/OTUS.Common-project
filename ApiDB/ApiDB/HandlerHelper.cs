@@ -50,7 +50,7 @@ namespace apidb
             var result = new Document()
             {
                 Header = new DocumentHeader() { Id = 1, Title = request.DocumentName, UserName = request.UserName },
-                Body = new List<Primitive>()
+                Body = new List<Shape>()
             };
             return Task.FromResult(JsonConvert.SerializeObject(result));
         }
@@ -82,7 +82,7 @@ namespace apidb
             var result = JsonConvert.SerializeObject(new Document()
             {
                 Header = new DocumentHeader() { Id = request.DocumentId },
-                Body = new List<Primitive>() }) ;
+                Body = new List<Shape>() }) ;
             return Task.FromResult(JsonConvert.SerializeObject(result));
         }
     }
