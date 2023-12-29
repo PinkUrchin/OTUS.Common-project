@@ -64,12 +64,12 @@ namespace apidb
             return Task.FromResult(JsonConvert.SerializeObject(result));
         }
     }
-    public class DeleteFigureHandler : IHandler
+    public class DeleteShapeHandler : IHandler
     {
         public Task<string> HandleRequest(IRequest req)
         {
-            var request = req as IDeleteFigureRequest;
-            var jobj = JObject.Parse(request?.FigureInfo);
+            var request = req as IDeleteShapeRequest;
+            var jobj = JObject.Parse(request?.ShapeInfo);
             var result = JsonConvert.SerializeObject(new StatusResponse() { Status = Status.Success, Description = "ok" });
             return Task.FromResult(JsonConvert.SerializeObject(result));
         }
@@ -98,7 +98,7 @@ namespace apidb
                 {Actions.GetListDocuments, new DocumentListHandler(m_dbcontext) },
                 {Actions.DeleteDocumentById, new DeleteDocumentHandler() },
                 {Actions.CreateDocument, new CreateDocumentHandler(m_dbcontext) },
-                {Actions.DeleteFigure, new DeleteFigureHandler() }
+                {Actions.DeleteShape, new DeleteShapeHandler() }
 
             };
 

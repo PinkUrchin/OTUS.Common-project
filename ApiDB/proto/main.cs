@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using protocol.Requests;
 
 namespace Protocol.Common
 {
@@ -9,9 +10,9 @@ namespace Protocol.Common
         public static readonly string GetDocumentById = "GetDocumentById";
         public static readonly string CreateDocument = "CreateDocument";
         public static readonly string DeleteDocumentById = "DeleteDocumentById";
-        public static readonly string CreateFigure = "CreateFigure";
-        public static readonly string UpdateFigure = "UpdateFigure";
-        public static readonly string DeleteFigure = "DeleteFigure";
+        public static readonly string CreateShape = "CreateShape";
+        public static readonly string UpdateShape = "UpdateShape";
+        public static readonly string DeleteShape = "DeleteShape";
     }
   
   
@@ -19,7 +20,14 @@ namespace Protocol.Common
     {
         private delegate IRequest Maker();
         private static Dictionary<string, Maker> m_makers = new Dictionary<string, Maker> {
-            { Actions.GetListDocuments, ()=>{return new GetListDocumentsRequest(); } } };
+            { Actions.GetListDocuments, ()=>{return new GetListDocumentsRequest(); } },
+            { Actions.CreateShape, ()=>{return new CreateShapeRequest(); } },
+            { Actions.DeleteDocumentById, ()=>{return new DeleteDocumentByIdRequest(); } },
+            { Actions.GetDocumentById, ()=>{return new GetDocumentByIdRequest(); } },
+            { Actions.DeleteShape, ()=>{return new DeleteShapeRequest(); } },
+            { Actions.UpdateShape, ()=>{return new UpdateShapeRequest(); } },
+            { Actions.CreateDocument, ()=>{return new CreateDocumentRequest(); } }
+        };
         public static IRequest CreateRequest(string action)
         {
             if (!m_makers.TryGetValue(action, out var maker))
