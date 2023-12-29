@@ -29,6 +29,6 @@ namespace Protocol.Common
         [JsonProperty("Header")]
         public DocumentHeader Header { get; set; }
         [JsonProperty("Body")]
-        public List<Primitive> Body { get; set; }
+        public List<Shape> Body { get; set; }
     }
 }
