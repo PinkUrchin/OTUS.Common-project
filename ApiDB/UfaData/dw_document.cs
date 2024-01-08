@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UfaData
+namespace DataProvider
 {
     public class dw_document
     {

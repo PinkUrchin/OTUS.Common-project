@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Drawing;
 
-namespace UfaData
+namespace DataProvider
 {
     public enum ShapeTypeEnum
     { 

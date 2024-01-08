@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 
 namespace Protocol.Common
 {
-   
-
     public class DocumentList
     {
         [JsonProperty("Documents")]
