@@ -28,7 +28,7 @@ namespace apidb
                 { Actions.GetDocumentById, new GetDocumentByIdHandler { DbCtx = postgresContext} },
                 { Actions.DeleteShape, new DeleteShapeHandler { DbCtx = postgresContext} },
                 { Actions.UpdateShape, new UpdateShapeHandler { DbCtx = postgresContext} },
-                { Actions.CreateDocument, new CreateDocumentHandler(postgresContext) }
+                { Actions.CreateDocument, new CreateDocumentHandler{ DbCtx = postgresContext} }
             };
         }
 

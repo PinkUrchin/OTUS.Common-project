@@ -16,19 +16,31 @@ namespace apidb
         }
         public Task<string> HandleRequest(IRequest req)
         {
-            //var docs = DbCtx.dw_documents.ToList();
+            //var request = req as IGetDocumentByIdRequest;
 
-            //var result = new DocumentList
+            //var doc = DbCtx.dw_documents.Where(x => x.Id == request.DocumentId).FirstOrDefault();
+            //var shapes = DbCtx.dw_shapes.Where(x => x.Id == request.DocumentId).ToList();
+
+            //var result = new Document
             //{
-            //    Documents = docs.Select(x => new DocumentHeader()
+            //    Header = new DocumentHeader
             //    {
-            //        Id = x.Id,
-            //        Title = x.Name,
-            //        UserName = x.CreateAuthor?.ToString()
+            //        Id = doc.Id,
+            //        Title = doc.Name,
+            //        UserName = doc.CreateAuthor,
+            //        UpdateAuthor = doc.UpdateAuthor,
+            //        UpdateDate = doc.UpdateDate != null ? (DateTime)doc.UpdateDate : DateTime.MinValue
+            //    },
+            //    Body = shapes.Select(x=> new Shape 
+            //    { 
+                        
+                    
             //    }).ToList()
             //};
 
             //return Task.FromResult(JsonConvert.SerializeObject(result));
+
+
             throw new NotImplementedException();
         }
     }

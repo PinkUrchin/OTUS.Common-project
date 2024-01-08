@@ -12,6 +12,6 @@ namespace apidb
     public interface IHandler
     {
         public Task<string> HandleRequest(IRequest req);
-        //public PostgresContext DbCtx { get; set; }
+        public PostgresContext DbCtx { get; set; }
     }
 }

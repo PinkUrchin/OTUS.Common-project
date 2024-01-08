@@ -5,13 +5,20 @@ namespace apidb.Tests
     [TestClass]
     public class DbTest
     {
-        PostgresContext ctx;
+        [TestMethod]
+        public void GetListDocumentsTest()
+        {
+            var handler = new GetListDocumentsHandler { DbCtx = new PostgresContext() };
+
+            var result = handler.HandleRequest(new GetListDocumentsRequest { UserName = "user" });
+
+            Assert.IsNotNull(result);
+        }
 
         [TestMethod]
         public void CreateDocumentTest()
-        {
-            ctx = new PostgresContext();
-            var handler = new CreateDocumentHandler(ctx);
+        {            
+            var handler = new CreateDocumentHandler { DbCtx = new PostgresContext() };
 
             var result = handler.HandleRequest(new CreateDocumentRequest
             {
@@ -19,14 +26,25 @@ namespace apidb.Tests
                 UserName = "user"
             });
 
-
-            //Task.Run(async () => {
-            //    var result = await handler.HandleRequest(new CreateDocumentRequest
-            //    {
-            //        DocumentName = "document",
-            //        UserName = "user"
-            //    });
-            //});
+            Assert.IsNotNull(result);
         }
+
+        [TestMethod]
+        public void GetDocumentByIdTest()
+        {
+            var handler = new GetDocumentByIdHandler { DbCtx = new PostgresContext() };
+
+            var result = handler.HandleRequest(new GetDocumentByIdRequest 
+            { 
+                UserName = "user",
+                DocumentId = 0
+            });
+
+            Assert.IsNotNull(result);
+        }
+
+
+
+
     }
 }

@@ -17,20 +17,27 @@ namespace apidb
         {            
         }
         public Task<string> HandleRequest(IRequest req)
-        {            
-            var docs = DbCtx.dw_documents.ToList();
-
-            var result = new DocumentList
+        {
+            try
             {
-                Documents = docs.Select(x => new DocumentHeader()
-                {
-                    Id = x.Id,
-                    Title = x.Name,
-                    UserName = string.IsNullOrEmpty(x.CreateAuthor) ? string.Empty : x.CreateAuthor.ToString()
-                }).ToList()
-            };
+                var docs = DbCtx.dw_documents.ToList();
 
-            return Task.FromResult(JsonConvert.SerializeObject(result));
+                var result = new DocumentList
+                {
+                    Documents = docs.Select(x => new DocumentHeader()
+                    {
+                        Id = x.Id,
+                        Title = x.Name,
+                        UserName = string.IsNullOrEmpty(x.CreateAuthor) ? string.Empty : x.CreateAuthor.ToString()
+                    }).ToList()
+                };
+
+                return Task.FromResult(JsonConvert.SerializeObject(result));
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Ошибка получения списка документов: {ex.Message}");
+            }
         }
     }
 }

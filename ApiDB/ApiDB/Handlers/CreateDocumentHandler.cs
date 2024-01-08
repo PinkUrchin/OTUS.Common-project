@@ -13,10 +13,9 @@ namespace apidb
 {
     public class CreateDocumentHandler : IHandler
     {
-        private PostgresContext DbCtx { get; set; }
-        public CreateDocumentHandler(PostgresContext context)
-        {
-            DbCtx = context;
+        public PostgresContext DbCtx { get; set; }
+        public CreateDocumentHandler()
+        {            
         }
 
         public Task<string> HandleRequest(IRequest req)
