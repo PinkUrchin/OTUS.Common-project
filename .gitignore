@@ -1,0 +1,19 @@
+﻿################################################################################
+# Данный GITIGNORE-файл был автоматически создан Microsoft(R) Visual Studio.
+################################################################################
+
+*.exe
+*.dll
+*.pdb
+/ApiDB/apidb.Tests/obj
+/ApiDB/apidb.Tests/bin/Debug/net8.0
+/ApiDB/proto/obj
+/ApiDB/proto/bin/Debug/net6.0
+/ApiDB/UfaData/obj
+/ApiDB/UfaData/bin/Debug/net6.0
+/ApiDB.Console.Client/.vs
+/ApiDB.Console.Client/ApiDB.Console.Client/obj/Debug/net6.0
+/ApiDB.Console.Client/ApiDB.Console.Client/bin/Debug/net6.0
+/ApiDB/ApiDB/obj
+/ApiDB/ApiDB/bin/Debug/net6.0
+/ApiDB/.vs
