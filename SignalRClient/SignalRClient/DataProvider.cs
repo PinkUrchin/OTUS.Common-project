@@ -20,7 +20,7 @@ namespace SingleRClient
         /// </summary>
         /// <param name="userName">User name</param>
         /// <returns>Documents headers list</returns>
-        Task<IEnumerable<DocumentHeader>> GetDocumentsListAsync(string userName);
+        Task<DocumentList> GetDocumentsListAsync(string userName);
 
         /// <summary>
         /// Get document by ID
@@ -178,9 +178,9 @@ namespace SingleRClient
         /// </summary>
         /// <param name="userName">User name</param>
         /// <returns>Documents headers list</returns>
-        public async Task<IEnumerable<DocumentHeader>> GetDocumentsListAsync(string userName)
+        public async Task<DocumentList> GetDocumentsListAsync(string userName)
         {
-            var tcs = new TaskCompletionSource<IEnumerable<DocumentHeader>>();
+            var tcs = new TaskCompletionSource<DocumentList>();
             OnGetListDocuments = (documentsList, userName) =>
             {
                 tcs.SetResult(documentsList);
@@ -425,15 +425,12 @@ namespace SingleRClient
 
         private void RegisterFunctions()
         {
-            _connection.On<List<string>, string>("GetListDocuments", (list, userName) =>
+            _connection.On<string, string>("GetListDocuments", (list, userName) =>
             {
                 try
-                {                    
-                    List<DocumentHeader> docsHeaderList = new List<DocumentHeader>();
-                    foreach (var doc in list)
-                        docsHeaderList.Add(JsonConvert.DeserializeObject<DocumentHeader>(doc));
+                {
 
-                    OnGetListDocuments?.Invoke(docsHeaderList, userName);
+                    OnGetListDocuments?.Invoke(JsonConvert.DeserializeObject<DocumentList>(list), userName);
                 }
                 catch
                 {
@@ -517,7 +514,7 @@ namespace SingleRClient
         public delegate void Reconnecting(string error);
         public delegate void Reconnected(string connectionId);
         public delegate void Closed(string error);
-        public delegate void GetListDocuments(List<DocumentHeader> documentsList, string userName);
+        public delegate void GetListDocuments(DocumentList documentsList, string userName);
         public delegate void GetDocumentById(Document doc, string userName);
         public delegate void CreateDocument(int docId, string userName, StatusResponse status);
         public delegate void DeleteDocumentById(StatusResponse status, string userName);
