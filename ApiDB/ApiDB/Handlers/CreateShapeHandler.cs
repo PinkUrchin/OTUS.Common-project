@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataProvider;
+using System.Drawing;
+using System.Reflection.Metadata;
 
 namespace apidb
 {    
@@ -17,20 +19,59 @@ namespace apidb
         }
         public Task<string> HandleRequest(IRequest req)
         {
-            //var docs = DbCtx.dw_documents.ToList();
+            var request = req as IShapeRequest;
 
-            //var result = new DocumentList
-            //{
-            //    Documents = docs.Select(x => new DocumentHeader()
-            //    {
-            //        Id = x.Id,
-            //        Title = x.Name,
-            //        UserName = x.CreateAuthor?.ToString()
-            //    }).ToList()
-            //};
+            var date = DateTime.Now.ToUniversalTime();
 
-            //return Task.FromResult(JsonConvert.SerializeObject(result));
-            throw new NotImplementedException();
+            // id генерится в момент добавления в таблицу            
+
+            var tmp = new dw_shape
+            {
+                DocumentId = request.DocumentId,
+                ShapeType = (ShapeTypeEnum)request.ShapeType,
+                CreateDate = request.CreateDate,
+                UpdateDate = request.UpdateDate,
+                CreateAuthor = request.CreateAuthor,
+                UpdateAuthor = request.UpdateAuthor,
+                Color= request.Color,
+                Coords = request.Coords
+            };
+
+            try
+            {
+                DbCtx.dw_shapes.Add(tmp);
+                DbCtx.SaveChanges();
+
+                var shape = DbCtx.dw_shapes.Where(x=> 
+                    x.DocumentId == tmp.DocumentId &&
+                    x.ShapeType == tmp.ShapeType && 
+                    x.CreateDate == tmp.CreateDate &&
+                    x.UpdateDate == tmp.UpdateDate &&
+                    x.CreateAuthor == tmp.CreateAuthor &&
+                    x.UpdateAuthor == tmp.UpdateAuthor &&
+                    x.Color == tmp.Color &&
+                    x.Coords == tmp.Coords
+                ).FirstOrDefault();
+
+                var result = new Shape
+                {
+                    Id = shape.Id,
+                    DocumentId = shape.DocumentId,
+                    ShapeType = (byte)shape.ShapeType,
+                    CreateDate = shape.CreateDate,
+                    UpdateDate = shape.UpdateDate,
+                    CreateAuthor = shape.CreateAuthor,
+                    UpdateAuthor = shape.UpdateAuthor,
+                    Color = shape.Color,
+                    Coords = shape.Coords
+                };
+
+                return Task.FromResult(JsonConvert.SerializeObject(result));
+            }
+            catch(Exception ex)
+            {
+                throw new ArgumentException($"Ошибка создания шейпа: {ex.Message}");
+            }
         }
     }
 }

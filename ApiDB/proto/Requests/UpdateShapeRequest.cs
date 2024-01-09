@@ -8,21 +8,20 @@ using System.Threading.Tasks;
 
 namespace protocol.Requests
 {
-    public interface IUpdateShapeRequest: IRequest
-    {
-        string UserName { get; set; }
-        int DocumentId { get; set; }
-        string ShapeInfo { get; set; }
-    }
+    //public interface IUpdateShapeRequest: IRequest
+    //{
+    //    string UserName { get; set; }
+    //    int DocumentId { get; set; }        
+    //}
 
-    public class UpdateShapeRequest : Request, IUpdateShapeRequest
-    {
-        [JsonProperty("user_name")]
-        public string UserName { get; set; }
-        [JsonProperty("document_id")]
-        public int DocumentId { get; set; }
-        [JsonProperty("Shape_info")]
-        public string ShapeInfo { get; set; }
-        public UpdateShapeRequest() : base(Actions.UpdateShape) { }
-    }
+    //public class UpdateShapeRequest : Request, IUpdateShapeRequest
+    //{
+    //    [JsonProperty("user_name")]
+    //    public string UserName { get; set; }
+    //    [JsonProperty("document_id")]
+    //    public int DocumentId { get; set; }
+    //    [JsonProperty("Shape_info")]
+    //    public string ShapeInfo { get; set; }
+    //    public UpdateShapeRequest() : base(Actions.UpdateShape) { }
+    //}
 }

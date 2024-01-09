@@ -17,8 +17,13 @@ namespace Protocol.Common
         public DateTime CreateDate { get; set; }
         [JsonProperty("UpdateDate")]
         public DateTime UpdateDate { get; set; }
+
         [JsonProperty("CreateAuthor")]
         public string CreateAuthor { get; set; }
+
+        [JsonProperty("UpdateAuthor")]
+        public string UpdateAuthor { get; set; }
+        
         [JsonProperty("Color")]
         public string  Color { get; set; }
      

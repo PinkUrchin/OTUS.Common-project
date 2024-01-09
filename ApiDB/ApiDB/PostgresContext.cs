@@ -14,8 +14,8 @@ namespace DataProvider
             Database.EnsureCreated();            
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {            
-            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres");
+        {
+            optionsBuilder.UseNpgsql("Host=85.193.81.154;Port=5432;Database=postgres;Username=postgres;Password=postgres");            
         }
     }
 }

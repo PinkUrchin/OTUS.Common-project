@@ -17,9 +17,24 @@ namespace apidb
         public Task<string> HandleRequest(IRequest req)
         {
             var request = req as IDeleteShapeRequest;
-            var jobj = JObject.Parse(request?.ShapeInfo);
-            var result = JsonConvert.SerializeObject(new StatusResponse() { Status = Status.Success, Description = "ok" });
-            return Task.FromResult(JsonConvert.SerializeObject(result));
+
+            try
+            {
+                var tmp = DbCtx.dw_shapes.Where(x => x.Id == request.Id).FirstOrDefault();
+
+                if (tmp != null)
+                {
+                    DbCtx.dw_shapes.Remove(tmp);
+                    DbCtx.SaveChanges();
+                }
+
+                var result = JsonConvert.SerializeObject(new StatusResponse() { Status = Status.Success, Description = "ok" });
+                return Task.FromResult(JsonConvert.SerializeObject(result));
+            }
+            catch (Exception ex) 
+            {
+                throw new ArgumentException($"Ошибка удаления шейпа: {ex.Message}");
+            }            
         }
     }
 }

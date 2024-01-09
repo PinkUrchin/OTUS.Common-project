@@ -21,11 +21,11 @@ namespace Protocol.Common
         private delegate IRequest Maker();
         private static Dictionary<string, Maker> m_makers = new Dictionary<string, Maker> {
             { Actions.GetListDocuments, ()=>{return new GetListDocumentsRequest(); } },
-            { Actions.CreateShape, ()=>{return new CreateShapeRequest(); } },
+            { Actions.CreateShape, ()=>{return new ShapeRequest(); } },
             { Actions.DeleteDocumentById, ()=>{return new DeleteDocumentByIdRequest(); } },
             { Actions.GetDocumentById, ()=>{return new GetDocumentByIdRequest(); } },
             { Actions.DeleteShape, ()=>{return new DeleteShapeRequest(); } },
-            { Actions.UpdateShape, ()=>{return new UpdateShapeRequest(); } },
+            { Actions.UpdateShape, ()=>{return new ShapeRequest(); } },
             { Actions.CreateDocument, ()=>{return new CreateDocumentRequest(); } }
         };
         public static IRequest CreateRequest(string action)
