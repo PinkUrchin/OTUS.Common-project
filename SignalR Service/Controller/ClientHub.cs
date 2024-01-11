@@ -56,45 +56,45 @@ namespace SignalR_Service.Controller
         }
 
         /// <summary>
-        /// Create figure in document
+        /// Create shape in document
         /// </summary>
         /// <param name="idDocument">ID document</param>
-        /// <param name="figureInfo">Information about figure (coords, type) in JSON format.</param>
+        /// <param name="shapeInfo">Information about shape (coords, type) in JSON format.</param>
         /// <param name="userName">Username</param>
         /// <returns>All info about operation</returns>
         [HttpPost]
-        public async Task CreateFigure(int idDocument, string figureInfo, string userName)
+        public async Task CreateShape(int idDocument, string shapeInfo, string userName)
         {
-            int? idFigure = null;
-            await Clients.All.SendAsync("CreateFigure", idDocument, figureInfo, idFigure, userName);
+            int? idShape = null;
+            await Clients.All.SendAsync("CreateShape", idDocument, shapeInfo, idShape, userName);
         }
 
         /// <summary>
-        /// Update figure in document
+        /// Update shape in document
         /// </summary>
         /// <param name="idDocument">ID document</param>
-        /// <param name="figureInfo">Information about figure (coords, type) in JSON format.</param>
+        /// <param name="shapeInfo">Information about shape (coords, type) in JSON format.</param>
         /// <param name="userName">Username</param>
         /// <returns>All info about operation</returns>
         [HttpPut]
-        public async Task UpdateFigure(int idDocument, string figureInfo, string userName)
+        public async Task UpdateShape(int idDocument, string shapeInfo, string userName)
         {
-            int? idFigure = null;
-            await Clients.All.SendAsync("UpdateFigure", idDocument, figureInfo, idFigure, userName);
+            int? idShape = null;
+            await Clients.All.SendAsync("UpdateShape ", idDocument, shapeInfo, idShape, userName);
         }
 
         /// <summary>
-        /// Delete figure in document
+        /// Delete shape in document
         /// </summary>
         /// <param name="idDocument">ID document</param>
-        /// <param name="figureInfo">Information about figure (coords, type) in JSON format.</param>
+        /// <param name="shapeInfo">Information about shape (coords, type) in JSON format.</param>
         /// <param name="userName">Username</param>
         /// <returns>All info about operation</returns>
         [HttpDelete]
-        public async Task DeleteFigure(int idDocument, string figureInfo, string userName)
+        public async Task DeleteShape(int idDocument, string shapeInfo, string userName)
         {
-            int? idFigure = null;
-            await Clients.All.SendAsync("DeleteFigure", idDocument, idFigure, userName);
+            int? idShape = null;
+            await Clients.All.SendAsync("DeleteShape", idDocument, idShape, userName);
         }
     }
 }
