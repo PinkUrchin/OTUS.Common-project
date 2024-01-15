@@ -7,9 +7,9 @@
         mc:Ignorable="d"
         Title="Выбор документа" Height="454" Width="716" WindowStartupLocation="CenterScreen">
     <Grid Margin="0,0,0,0">
-        <ListBox Name="lbDocs" Margin="10,10,10,95" d:ItemsSource="{d:SampleData ItemCount=5}"/>
-        <CheckBox Name="chNewDoc" Content="Создать документ:" HorizontalAlignment="Left" Margin="10,0,0,74" Width="145" Height="16" VerticalAlignment="Bottom"/>
-        <TextBox Name="txtDocName" HorizontalAlignment="Left" Height="22" Margin="10,0,0,47" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" Width="241"/>
+        <ListBox Name="lbDocs" Margin="10,10,10,95" DisplayMemberPath="Title" SelectionChanged="lbDocs_SelectionChanged"/>
+        <CheckBox Name="chNewDoc" Content="Создать документ:" HorizontalAlignment="Left" Margin="10,0,0,74" Width="145" Height="16" VerticalAlignment="Bottom" Checked="chNewDoc_Checked"/>
+        <TextBox Name="txtDocName" HorizontalAlignment="Left" Height="22" Margin="10,0,0,47" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" Width="241" TextChanged="txtDocName_TextChanged"/>
         <Button Name="btnCancel" Content="Отмена" Margin="0,0,10,10" Height="26" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="92" Grid.Column="1" Click="btnCancel_Click"/>
         <Button Name="btnOk" Content="Ok" Margin="0,0,114,10" Height="26" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="91" Grid.Column="1" Click="btnOk_Click"/>
     </Grid>

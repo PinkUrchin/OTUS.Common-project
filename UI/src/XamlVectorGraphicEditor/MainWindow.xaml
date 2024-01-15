@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="MainWindow"
         Title="Выбор документа"
-        WindowState="Normal" WindowStartupLocation="CenterScreen" Width="1024" Height="600">
+        WindowState="Normal" WindowStartupLocation="CenterScreen" Width="1024" Height="600"
+        Closed="Window_Closed">
     <Grid Margin="0,0,0,0">
         <Canvas x:Name="MainCanvas" 
             Background="Transparent"
@@ -33,6 +34,9 @@
                 </ContextMenu>
             </Canvas.ContextMenu>
         </Canvas>
-        <Button Name="btnSelectDocument" Content="Выбор документа" HorizontalAlignment="Left" Height="26" Margin="10,10,0,0" VerticalAlignment="Top" Width="112" Click="btnSelectDocument_Click"/>
+        <Button Name="btnSelectDocument" Content="Выбор документа" HorizontalAlignment="Left" Height="25" Margin="10,10,0,0" VerticalAlignment="Top" Width="112" Click="btnSelectDocument_Click"/>
+        <Button Name="btnTestAddShape" Content="Test_Add" HorizontalAlignment="Left" Height="25" Margin="130,10,0,0" VerticalAlignment="Top" Width="65" Click="btnTestAddShape_Click"/>
+        <Button Name="btnTestUpdateShape" Content="Test_Update" HorizontalAlignment="Left" Height="25" Margin="200,10,0,0" VerticalAlignment="Top" Width="65" Click="btnTestUpdateShape_Click"/>
+        <Button Name="btnTestRemoveShape" Content="Test_Del" HorizontalAlignment="Left" Height="25" Margin="270,10,0,0" VerticalAlignment="Top" Width="65" Click="btnTestRemoveShape_Click"/>
     </Grid>
 </Window>

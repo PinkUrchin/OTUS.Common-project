@@ -1,19 +1,26 @@
-﻿using System.Windows.Media;
+﻿using System;
+using System.Windows.Media;
 using System.Windows.Shapes;
 
 struct ShapeBackgroundChanger : IBackgroundChanger
 {
-    private readonly Shape Component;
+    private readonly Shape _component;
+    private readonly Action _change;
 
     public Brush Background
     {
-        get => Component.Fill;
-        set => Component.Fill = value;
+        get => _component.Fill;
+        set
+        {
+            _component.Fill = value;
+            _change?.Invoke();
+        }
     }
 
-    public ShapeBackgroundChanger(in Shape rect)
+    public ShapeBackgroundChanger(in Shape rect, Action change)
     {
-        Component = rect;
+        _component = rect;
+        _change = change;
     }
 }
 

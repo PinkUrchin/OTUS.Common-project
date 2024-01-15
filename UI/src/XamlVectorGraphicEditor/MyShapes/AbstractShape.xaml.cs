@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,8 +14,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using XamlVectorGraphicEditor;
+using XamlVectorGraphicEditor.MyShapesDTO;
 
-partial class AbstractShape : Border
+abstract partial class AbstractShape : Border, ICloneable
 {
     private static AbstractShape Top;
     private static int LastZIndex;
@@ -40,7 +43,25 @@ partial class AbstractShape : Border
         BorderBrush = Brushes.DeepSkyBlue;
     }
 
-    private void DeleteClick(object sender, RoutedEventArgs e) => (VisualParent as Canvas).Children.Remove(this);
+    private async void DeleteClick(object sender, RoutedEventArgs e)
+    {
+        bool canDelete = true;
+
+        var shape = GetProtocolShape();
+        if (shape != null)
+        {
+            var result = await Context.DataProvider().DeleteShapeAsync(Context.Document.Header.Id, shape, Context.UserName);
+            canDelete = result.Status == Protocol.Common.Status.Success;
+
+            if (canDelete)
+            {
+                Context.Document.Body.RemoveAll(x => x.Id == shape.Id);
+            }
+        }
+
+        if (canDelete)
+            (VisualParent as Canvas).Children.Remove(this);
+    }
 
     private void Rotate(in int angle)
     {
@@ -70,58 +91,76 @@ partial class AbstractShape : Border
     private void Right90Click(object sender, RoutedEventArgs e) => Rotate(90);
 
     private void CloneClick(object sender, RoutedEventArgs e) =>
-        (VisualParent as Canvas).Children.Add(new AbstractShape(this));
+        (VisualParent as Canvas).Children.Add(Copy());
 
     public AbstractShape(in Point whereSetMe, in Shape shape)
     {
         InitializeComponent();
         Child = shape;
-        ContextMenu.AddPaletteHeader(new ShapeBackgroundChanger(shape));
+        ContextMenu.AddPaletteHeader(new ShapeBackgroundChanger(shape, () => Changed?.Invoke(this)));
         Canvas.SetLeft(this, whereSetMe.X);
         Canvas.SetTop(this, whereSetMe.Y);
         LastZIndex = Canvas.GetZIndex(this);
     }
 
-    public AbstractShape(in AbstractShape other)
+    public Action<AbstractShape> Changed { get; set; }
+
+    public AbstractShape Copy()
     {
-        InitializeComponent();
-        Height = other.Height;
-        Width = other.Width;
-        RenderTransform = other.RenderTransform;
-        LayoutTransform = other.LayoutTransform;
-        Canvas.SetLeft(this, Canvas.GetLeft(other) - 15);
-        Canvas.SetTop(this, Canvas.GetTop(other) - 15);
-        BorderBrush = Brushes.Yellow;
-        LastZIndex = Canvas.GetZIndex(this);
-        var otherShape = other.Child as Shape;
-        Shape newShape;
-        switch (otherShape)
+        var ret = Clone() as AbstractShape;
+
+        var p = ret.Point;
+        ret.Point = new Point(p.X + 15, p.Y + 15);
+
+        return ret;
+    }
+
+    public int Id { get; set; }
+
+    public Protocol.Common.Shape GetProtocolShape()
+    {
+        var shape = Context.Document.Body.Find(x => x.Id == Id);
+        return shape;   
+    }
+    
+    public string UserName { get; set; }
+    public Color FillColor
+    {
+        get
         {
-            case Ellipse elli:
-                newShape = new Ellipse();
-                break;
-            case Polygon poly:
-                newShape = new Polygon()
-                {
-                    Points = poly.Points,
-                    Stretch = Stretch.Fill
-                };
-                break;
-            case Rectangle rect:
-            default:
-                newShape = new Rectangle();
-                break;
+            if ((Child as Shape).Fill is SolidColorBrush sb)
+                return sb.Color;
+            else
+                return Color.FromArgb(0, 0, 0, 0);
         }
-        newShape.Fill = otherShape.Fill;
-        newShape.RenderTransform = otherShape.RenderTransform;
-        newShape.LayoutTransform = otherShape.LayoutTransform;
-        Child = newShape;
-        ContextMenu.AddPaletteHeader(new ShapeBackgroundChanger(newShape));
+        set
+        {
+            (Child as Shape).Fill = new SolidColorBrush(value);
+        }
     }
 
-    private void Border_SizeChanged(object sender, SizeChangedEventArgs e)
+    public Point Point {
+        get => new Point(Canvas.GetLeft(this), Canvas.GetTop(this));
+        set
+        {
+            Canvas.SetLeft(this, value.X);
+            Canvas.SetTop(this, value.Y);
+        }
+    }
+
+    public abstract object Clone();
+    public abstract AbstractShapeDTO CreateDTO();
+
+    public virtual Protocol.Common.Shape CreateProtocolShape()
     {
-
-    }
+        var ret = new Protocol.Common.Shape();
+        ret.CreateDate = DateTime.Now;
+        ret.UpdateDate = ret.CreateDate;
+        ret.CreateAuthor = Context.UserName;
+        ret.UpdateAuthor = ret.CreateAuthor;
+        ret.DocumentId = Context.Document.Header.Id;
+        ret.Coords = JsonConvert.SerializeObject(CreateDTO());
+        return ret;
+    }    
 }
 

@@ -12,7 +12,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Markup;
+using System.Threading;
 using XamlVectorGraphicEditor;
+using Protocol.Common;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
+using XamlVectorGraphicEditor.MyShapes;
 
 public partial class MainWindow : Window
 {
@@ -104,7 +109,7 @@ public partial class MainWindow : Window
         {
             return null;
         }
-        return hit.VisualHit is Shape child ? child.Parent as AbstractShape : hit.VisualHit as AbstractShape;
+        return hit.VisualHit is System.Windows.Shapes.Shape child ? child.Parent as AbstractShape : hit.VisualHit as AbstractShape;
     }
 
     // Start dragging.
@@ -208,25 +213,136 @@ public partial class MainWindow : Window
     }
 
     // Stop dragging.
-    private void MainCanvasMouseUp(object sender, MouseButtonEventArgs e) => DragInProgress = false;
+    private async void MainCanvasMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (DragInProgress)
+        {
+            DragInProgress = false;
+            if (CurrentObject != null)
+                await UpdateProtocolShape(CurrentObject);
+        }
+    }
 
     public MainWindow()
     {
         InitializeComponent();
         MainCanvas.ContextMenu.AddPaletteHeader(new PanelBackgroundChanger(MainCanvas));
+
+        btnSelectDocument.IsEnabled = false;
+        btnSelectDocument.Content = "Подключение...";
+
+#if !MOCK
+        btnTestAddShape.Visibility = Visibility.Hidden;
+        btnTestRemoveShape.Visibility = Visibility.Hidden;
+        btnTestUpdateShape.Visibility = Visibility.Hidden;
+#endif
     }
 
     // Last point where context menu was been opened
     private Point LastContextMenuPoint;
 
-    private void RectangleClick(object sender, RoutedEventArgs e) =>
-        MainCanvas.Children.Add(new MyRectangle(LastContextMenuPoint));
+    private void ProtocolCreateShape(int docId, Protocol.Common.Shape shape, int? shapeId, string userName, StatusResponse status)
+    {
+        if (Context.Document == null || docId != Context.Document.Header.Id)
+            return;
 
+        AddUIShape(shape);
+        Context.Document.Body.Add(shape);
+    }
+
+    private void ProtocolUpdateShape(int docId, Protocol.Common.Shape shape, int? shapeId, string userName, StatusResponse status)
+    {
+        if (Context.Document == null || docId != Context.Document.Header.Id)
+            return;
+
+        RemoveShape(shape.Id);
+        Context.Document.Body.RemoveAll(x => x.Id == shape.Id);
+        
+        AddUIShape(shape);
+        Context.Document.Body.Add(shape);
+    }
+
+    private void ProtocolDeleteShape(int docId, int? shapeId, string userName, StatusResponse status)
+    {
+        if (Context.Document == null || docId != Context.Document.Header.Id || !shapeId.HasValue)
+            return;
+
+        RemoveShape(shapeId.Value);
+        Context.Document.Body.RemoveAll(x => x.Id == shapeId.Value);
+    }
+
+    private void RemoveShape(int id)
+    {
+        for (int i = MainCanvas.Children.Count - 1; i >= 0; i--) 
+        {
+            if (MainCanvas.Children[i] is AbstractShape shape && shape.Id == id)
+                MainCanvas.Children.RemoveAt(i);
+        }
+    }
+
+    private async Task UpdateProtocolShape(AbstractShape shape)
+    {
+        var protocolShape = shape.GetProtocolShape();
+        if (protocolShape == null)
+            return;
+
+        protocolShape.Coords = JsonConvert.SerializeObject(shape.CreateDTO());
+        protocolShape.UpdateDate = DateTime.Now;
+        protocolShape.UpdateAuthor = Context.UserName;
+        await Context.DataProvider().UpdateShapeAsync(Context.Document.Header.Id, protocolShape, Context.UserName);
+    }
+
+    private async void ShapeChanged(AbstractShape shape)
+    {
+        await UpdateProtocolShape(shape);
+    }
+
+    private async Task<bool> AddShape(AbstractShape shape)
+    {
+        var protocolShape = shape.CreateProtocolShape();
+        var result = await Context.DataProvider().CreateShapeAsync(Context.Document.Header.Id, protocolShape, Context.UserName);
+        if (result.Item2.Status == Status.Success)
+        {
+            shape.Id = result.Item1.Value;
+            shape.Changed = ShapeChanged;
+
+            protocolShape.Id = shape.Id;
+            Context.Document.Body.Add(protocolShape);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private async void RectangleClick(object sender, RoutedEventArgs e)
+    {
+        var shape = new MyRectangle(LastContextMenuPoint);
+        if (await AddShape(shape)) 
+        {
+            MainCanvas.Children.Add(shape);
+        }
+    }
+    
     private void SaveContextPoint(object sender, MouseButtonEventArgs e) => LastContextMenuPoint = e.GetPosition(MainCanvas);
 
-    private void TriangleClick(object sender, RoutedEventArgs e) => MainCanvas.Children.Add(new MyTriangle(LastContextMenuPoint));
+    private async void TriangleClick(object sender, RoutedEventArgs e)
+    {
+        var shape = new MyTriangle(LastContextMenuPoint);
+        if (await AddShape(shape))
+        {
+            MainCanvas.Children.Add(shape);
+        }
+    }
 
-    private void EllipseClick(object sender, RoutedEventArgs e) => MainCanvas.Children.Add(new MyEllipse(LastContextMenuPoint));
+    private async void EllipseClick(object sender, RoutedEventArgs e)
+    {
+        var shape = new MyEllipse(LastContextMenuPoint);
+        if (await AddShape(shape))
+        {
+            MainCanvas.Children.Add(shape);
+        }
+    }
 
     private void ClearClick(object sender, RoutedEventArgs e) => MainCanvas.Children.Clear();
 
@@ -243,18 +359,34 @@ public partial class MainWindow : Window
         }
     }
 
-    private void btnSelectDocument_Click(object sender, RoutedEventArgs e)
+    private async Task LoadOrCreateDocument(SelectDocument dlg)
+    {
+        if (dlg.IsNewDoc)
+        {
+            var result = await Context.DataProvider().CreateDocumentAsync(dlg.NewDocName, Context.UserName);
+
+            if (result.Item2.Status == Status.Success)
+                await LoadDocument(result.Item1);
+        }
+        else
+        {
+            await LoadDocument(dlg.SelectedDoc.Id);
+        }
+    }
+
+    private async void btnSelectDocument_Click(object sender, RoutedEventArgs e)
     {
         var dlg = new SelectDocument();
         dlg.Owner = this;
         if (!dlg.ShowDialog() ?? false)
             return;
 
-        LoadDocument();
+        await LoadOrCreateDocument(dlg);
     }
 
     private bool _shown;
-    protected override void OnContentRendered(EventArgs e)
+    private CancellationTokenSource _initCs;
+    protected override async void OnContentRendered(EventArgs e)
     {
         base.OnContentRendered(e);
 
@@ -263,18 +395,94 @@ public partial class MainWindow : Window
 
         _shown = true;
 
+        _initCs = new CancellationTokenSource();
+        var provider = await Context.Init(_initCs.Token);
+        _initCs = null;
+
+        if (provider == null)
+        {
+            Close();
+            return;
+        }
+
+        btnSelectDocument.IsEnabled = true;
+        btnSelectDocument.Content = "Выбор документа";
+
+        provider.OnCreateShape += ProtocolCreateShape;
+        provider.OnUpdateShape += ProtocolUpdateShape;
+        provider.OnDeleteShape += ProtocolDeleteShape;
+
+
+        //
         var dlg = new SelectDocument();
         dlg.Owner = this;
 
-        if (!dlg.ShowDialog() ?? false)
+        if (dlg.ShowDialog() ?? false)
+        {
+            await LoadOrCreateDocument(dlg);
+        }
+        else
+        {
             Close();
-
-        LoadDocument();
+        }
     }
 
-    private void LoadDocument()
+    private void AddUIShape(Protocol.Common.Shape shape)
     {
-        //
+        var uiShape = ShapeFactory.CreateShape(shape);
+        if (uiShape is AbstractShape aShape)
+            aShape.Changed = ShapeChanged;
+
+        MainCanvas.Children.Add(uiShape);
+    }
+
+    private async Task LoadDocument(int id)
+    {
+        var doc = await Context.DataProvider().GetDocumentByIdAsync(id, Context.UserName);
+        Context.Document = doc;
+
+        Title = doc.Header.Title;
+        MainCanvas.Children.Clear();
+        foreach (var shape in doc.Body)
+        {
+            AddUIShape(shape);
+        }
+    }
+
+    private void btnTestAddShape_Click(object sender, RoutedEventArgs e)
+    {
+        if (Context.DataProvider() is ITestDataProvider tp)
+        {
+            tp.TestAddShape(Context.Document.Header.Id);
+        }
+    }
+
+    private void btnTestUpdateShape_Click(object sender, RoutedEventArgs e)
+    {
+        if (Context.DataProvider() is ITestDataProvider tp)
+        {
+            tp.TestUpdateShape(Context.Document.Header.Id);
+        }
+    }
+
+    private void btnTestRemoveShape_Click(object sender, RoutedEventArgs e)
+    {
+        if (Context.DataProvider() is ITestDataProvider tp)
+        {
+            tp.TestDeleteShape(Context.Document.Header.Id);
+        }
+    }
+
+    private void Window_Closed(object sender, EventArgs e)
+    {
+        if (_initCs != null)
+            _initCs.Cancel();
+
+        var provider = Context.DataProvider();
+        if (provider is IDisposable disp) 
+        { 
+            disp.Dispose();
+        }
     }
 }
 
