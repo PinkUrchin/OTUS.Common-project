@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using System.Collections.Generic;
+using SignalR_Service.Models;
 
 namespace SignalR_Service.Controller
 {
     public class ClientHub : Hub
     {
+        private Serializer _serializer = new Serializer();
         /// <summary>
         /// Return document by ID
         /// </summary>
@@ -14,8 +15,8 @@ namespace SignalR_Service.Controller
         [HttpGet]
         public async Task GetDocumentById(int idDocument, string userName)
         {
-            string doc = "";
-            await Clients.Caller.SendAsync("GetDocumentById", doc, userName);
+            var res = await _serializer.GetDocumentById(idDocument, userName);
+            await Clients.Caller.SendAsync("GetDocumentById", res, userName);
         }
 
         /// <summary>
@@ -25,8 +26,8 @@ namespace SignalR_Service.Controller
         [HttpGet]
         public async Task GetListDocuments(string userName)
         {
-            List<string> list = new List<string>();
-            await Clients.Caller.SendAsync("GetListDocuments", list, userName);
+            var res = await _serializer.GetListDocuments(userName);
+            await Clients.Caller.SendAsync("GetListDocuments", res, userName);
         }
 
         /// <summary>
@@ -37,9 +38,8 @@ namespace SignalR_Service.Controller
         [HttpPost]
         public async Task CreateDocument(string name, string userName)
         {
-            int? idDocument = null;
-            string doc = "";
-            await Clients.All.SendAsync("CreateDocument", doc, idDocument, userName);
+            var res = await _serializer.CreateDocument(name, userName);
+            await Clients.All.SendAsync("CreateDocument", res, userName);
         }
 
         /// <summary>
@@ -51,8 +51,8 @@ namespace SignalR_Service.Controller
         [HttpDelete]
         public async Task DeleteDocumentById(int idDocument, string userName)
         {
-            bool success = true;
-            await Clients.All.SendAsync("DeleteDocumentById", success, userName);
+            var res = await _serializer.GetDocumentById(idDocument, userName);
+            await Clients.All.SendAsync("DeleteDocumentById", res, userName);
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace SignalR_Service.Controller
         [HttpPost]
         public async Task CreateShape(int idDocument, string shapeInfo, string userName)
         {
-            int? idShape = null;
-            await Clients.All.SendAsync("CreateShape", idDocument, shapeInfo, idShape, userName);
+            var res = await _serializer.CreateShape(idDocument, shapeInfo, userName);
+            await Clients.All.SendAsync("CreateShape", res, userName);
         }
 
         /// <summary>
@@ -79,8 +79,8 @@ namespace SignalR_Service.Controller
         [HttpPut]
         public async Task UpdateShape(int idDocument, string shapeInfo, string userName)
         {
-            int? idShape = null;
-            await Clients.All.SendAsync("UpdateShape ", idDocument, shapeInfo, idShape, userName);
+            var res = await _serializer.UpdateShape(idDocument, shapeInfo, userName);
+            await Clients.All.SendAsync("UpdateShape ", res, userName);
         }
 
         /// <summary>
@@ -93,8 +93,8 @@ namespace SignalR_Service.Controller
         [HttpDelete]
         public async Task DeleteShape(int idDocument, string shapeInfo, string userName)
         {
-            int? idShape = null;
-            await Clients.All.SendAsync("DeleteShape", idDocument, idShape, userName);
+            var res = await _serializer.DeleteShape(idDocument, shapeInfo, userName);
+            await Clients.All.SendAsync("DeleteShape", res, userName);
         }
     }
 }
