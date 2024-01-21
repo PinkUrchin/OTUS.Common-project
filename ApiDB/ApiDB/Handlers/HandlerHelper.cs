@@ -45,7 +45,11 @@ namespace apidb
             }
             catch (Exception e)
             {
-                return "";
+                return JsonConvert.SerializeObject(new StatusResponse()
+                {
+                    Status = Status.Failure,
+                    Description = e.Message
+                });
             }
         }
     }
