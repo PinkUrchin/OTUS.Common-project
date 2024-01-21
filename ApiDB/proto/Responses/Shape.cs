@@ -7,7 +7,32 @@ using System.Threading.Tasks;
 
 namespace Protocol.Common
 {
-    public class Shape
+    public interface IShape : IResponse
+    {
+        [JsonProperty("Id")]
+        int Id { get; set; }
+        [JsonProperty("ShapeType")]
+        byte ShapeType { get; set; }
+        [JsonProperty("CreateDate")]
+        DateTime CreateDate { get; set; }
+        [JsonProperty("UpdateDate")]
+        DateTime UpdateDate { get; set; }
+
+        [JsonProperty("CreateAuthor")]
+        string CreateAuthor { get; set; }
+
+        [JsonProperty("UpdateAuthor")]
+        string UpdateAuthor { get; set; }
+
+        [JsonProperty("Color")]
+        string Color { get; set; }
+
+        [JsonProperty("DocumentId")]
+        int DocumentId { get; set; }
+        [JsonProperty("Coords")]
+        string Coords { get; set; }
+    }
+    public class Shape: BaseResponse, IShape
     {
         [JsonProperty("Id")]
         public int Id { get; set; }
@@ -31,5 +56,7 @@ namespace Protocol.Common
         public int DocumentId { get; set; }
         [JsonProperty("Coords")]
         public string Coords { get; set; }
+
+        public Shape() : base(ResponseName.Shape) { }
     }
 }

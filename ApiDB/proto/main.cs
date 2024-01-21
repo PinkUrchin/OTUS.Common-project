@@ -14,8 +14,14 @@ namespace Protocol.Common
         public static readonly string UpdateShape = "UpdateShape";
         public static readonly string DeleteShape = "DeleteShape";
     }
-  
-  
+
+    public static class ResponseName
+    {
+        public static readonly string DocumentList = "DocumentList";
+        public static readonly string Document = "Document";
+        public static readonly string Shape = "Shape";
+        public static readonly string Status = "Status";
+    }
     public static class RequestMaker
     {
         private delegate IRequest Maker();

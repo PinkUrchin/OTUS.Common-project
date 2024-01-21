@@ -7,11 +7,16 @@ using System.Threading.Tasks;
 
 namespace Protocol.Common
 {
-    public class DocumentList
+    public interface IDocumentListResponse : IResponse
+    {
+        [JsonProperty("Documents")]
+        List<DocumentHeader> Documents { set; get; }
+    }
+    public class DocumentList: BaseResponse, IDocumentListResponse
     {
         [JsonProperty("Documents")]
         public List<DocumentHeader> Documents { set; get; }
-        public DocumentList()
+        public DocumentList(): base (ResponseName.DocumentList)
         {
             Documents = new List<DocumentHeader>();
         }

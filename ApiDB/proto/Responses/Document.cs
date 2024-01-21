@@ -24,11 +24,21 @@ namespace Protocol.Common
         [JsonProperty("CreateAuthor")]
         public string CreateAuthor { get; set; }
     }
-    public class Document
+
+    public interface IDocument : IResponse
+    {
+        [JsonProperty("Header")]
+        DocumentHeader Header { get; set; }
+        [JsonProperty("Body")]
+        List<Shape> Body { get; set; }
+    }
+    public class Document: BaseResponse, IDocument
     {
         [JsonProperty("Header")]
         public DocumentHeader Header { get; set; }
         [JsonProperty("Body")]
         public List<Shape> Body { get; set; }
+
+        public Document() : base(ResponseName.Document) { }
     }
 }
