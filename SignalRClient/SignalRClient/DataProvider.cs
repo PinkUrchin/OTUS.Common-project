@@ -61,7 +61,7 @@ namespace SingleRClient
         /// <param name="shape">Shape object</param>
         /// <param name="userName">User name</param>
         /// <returns>(Shape ID, status info)</returns>
-        Task<(int?, StatusResponse)> CreateShapeAsync(int docId, Shape shape, string userName);
+        Task<(int?, StatusResponse)> CreateShapeAsync(Shape shape, string userName);
         /// <summary>
         /// Notify users when a new shape is created
         /// </summary>
@@ -74,7 +74,7 @@ namespace SingleRClient
         /// <param name="shape">Shape object</param>
         /// <param name="userName">User name</param>
         /// <returns>Status info</returns>
-        Task<StatusResponse> UpdateShapeAsync(int docId, Shape shape, string userName);
+        Task<StatusResponse> UpdateShapeAsync(Shape shape, string userName);
         /// <summary>
         /// Notify users when the shape is updated
         /// </summary>
@@ -87,7 +87,7 @@ namespace SingleRClient
         /// <param name="shape">Shape object</param>
         /// <param name="userName">User name</param>
         /// <returns>Status info</returns>
-        Task<StatusResponse> DeleteShapeAsync(int docId, Shape shape, string userName);
+        Task<StatusResponse> DeleteShapeAsync(Shape shape, string userName);
         /// <summary>
         /// Notify users when the shape is deleted
         /// </summary>
@@ -295,7 +295,7 @@ namespace SingleRClient
         /// <param name="shape">Shape object</param>
         /// <param name="userName">User name</param>
         /// <returns>(Shape ID, status info)</returns>
-        public async Task<(int?, StatusResponse)> CreateShapeAsync(int docId, Shape shape, string userName)
+        public async Task<(int?, StatusResponse)> CreateShapeAsync(Shape shape, string userName)
         {
             var tcs = new TaskCompletionSource<(int?, StatusResponse)>();
             OnCreateShape = (shape, status) =>
@@ -307,7 +307,6 @@ namespace SingleRClient
             {
                 try
                 {
-                    shape.DocumentId = docId;
                     _connection.InvokeAsync("CreateShape", JsonConvert.SerializeObject(shape), userName);
                 }
                 catch (Exception ex)
@@ -326,7 +325,7 @@ namespace SingleRClient
         /// <param name="shape">Shape object</param>
         /// <param name="userName">User name</param>
         /// <returns>Status info</returns>
-        public async Task<StatusResponse> UpdateShapeAsync(int docId, Shape shape, string userName)
+        public async Task<StatusResponse> UpdateShapeAsync(Shape shape, string userName)
         {
             var tcs = new TaskCompletionSource<StatusResponse>();
             OnUpdateShape = (shape, status) =>
@@ -338,7 +337,6 @@ namespace SingleRClient
             {
                 try
                 {
-                    shape.DocumentId = docId;
                     _connection.InvokeAsync("UpdateShape", shape, userName);
                 }
                 catch (Exception ex)
@@ -357,7 +355,7 @@ namespace SingleRClient
         /// <param name="shape">Shape object</param>
         /// <param name="userName">User name</param>
         /// <returns>Status info</returns>
-        public async Task<StatusResponse> DeleteShapeAsync(int docId, Shape shape, string userName)
+        public async Task<StatusResponse> DeleteShapeAsync(Shape shape, string userName)
         {
             var tcs = new TaskCompletionSource<StatusResponse>();
             OnDeleteShape = (shapeId, status) =>
@@ -369,7 +367,6 @@ namespace SingleRClient
             {
                 try
                 {
-                    shape.DocumentId = docId;
                     _connection.InvokeAsync("UpdateShape", JsonConvert.SerializeObject(shape), userName);
                 }
                 catch (Exception ex)
