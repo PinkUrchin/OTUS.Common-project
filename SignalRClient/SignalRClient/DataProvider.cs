@@ -298,16 +298,17 @@ namespace SingleRClient
         public async Task<(int?, StatusResponse)> CreateShapeAsync(int docId, Shape shape, string userName)
         {
             var tcs = new TaskCompletionSource<(int?, StatusResponse)>();
-            OnCreateShape = (docId, shape, shapeId, userName, status) =>
+            OnCreateShape = (shape, status) =>
             {
-                tcs.SetResult((shapeId, status));
+                tcs.SetResult((shape.Id, status));
             };
 
             await Task.Run(() =>
             {
                 try
                 {
-                    _connection.InvokeAsync("CreateShape", docId, JsonConvert.SerializeObject(shape), userName);
+                    shape.DocumentId = docId;
+                    _connection.InvokeAsync("CreateShape", JsonConvert.SerializeObject(shape), userName);
                 }
                 catch (Exception ex)
                 {
@@ -328,7 +329,7 @@ namespace SingleRClient
         public async Task<StatusResponse> UpdateShapeAsync(int docId, Shape shape, string userName)
         {
             var tcs = new TaskCompletionSource<StatusResponse>();
-            OnUpdateShape = (docId, shape, shapeId, userName, status) =>
+            OnUpdateShape = (shape, status) =>
             {
                 tcs.SetResult(status);
             };
@@ -337,7 +338,8 @@ namespace SingleRClient
             {
                 try
                 {
-                    _connection.InvokeAsync("UpdateShape", docId, shape, userName);
+                    shape.DocumentId = docId;
+                    _connection.InvokeAsync("UpdateShape", shape, userName);
                 }
                 catch (Exception ex)
                 {
@@ -358,7 +360,7 @@ namespace SingleRClient
         public async Task<StatusResponse> DeleteShapeAsync(int docId, Shape shape, string userName)
         {
             var tcs = new TaskCompletionSource<StatusResponse>();
-            OnDeleteShape = (docId, shapeId, userName, status) =>
+            OnDeleteShape = (shapeId, status) =>
             {
                 tcs.SetResult(status);
             };
@@ -367,7 +369,8 @@ namespace SingleRClient
             {
                 try
                 {
-                    _connection.InvokeAsync("UpdateShape", docId, JsonConvert.SerializeObject(shape), userName);
+                    shape.DocumentId = docId;
+                    _connection.InvokeAsync("UpdateShape", JsonConvert.SerializeObject(shape), userName);
                 }
                 catch (Exception ex)
                 {
@@ -425,12 +428,12 @@ namespace SingleRClient
 
         private void RegisterFunctions()
         {
-            _connection.On<string, string>("GetListDocuments", (list, userName) =>
+            _connection.On<DocumentList, string>("GetListDocuments", (list, userName) =>
             {
                 try
                 {
 
-                    OnGetListDocuments?.Invoke(JsonConvert.DeserializeObject<DocumentList>(list), userName);
+                    OnGetListDocuments?.Invoke(list, userName);
                 }
                 catch
                 {
@@ -438,11 +441,11 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<string, string>("GetDocumentById", (doc, userName) =>
+            _connection.On<Document, string>("GetDocumentById", (doc, userName) =>
             {
                 try
                 {
-                    OnGetDocumentById?.Invoke(JsonConvert.DeserializeObject<Document>(doc), userName);
+                    OnGetDocumentById?.Invoke(doc, userName);
                 }
                 catch
                 {
@@ -450,11 +453,11 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<int, string, string>("CreateDocument", (docId, userName, status) =>
+            _connection.On<Document, StatusResponse>("CreateDocument", (document, status) =>
             {
                 try
                 {
-                    OnCreateDocument?.Invoke(docId, userName, JsonConvert.DeserializeObject<StatusResponse>(status));
+                    OnCreateDocument?.Invoke(document.Header.Id, document.Header.UserName, status);
                 }
                 catch
                 {
@@ -462,11 +465,11 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<string, string>("DeleteDocumentById", (status, userName) =>
+            _connection.On<StatusResponse, string>("DeleteDocumentById", (status, userName) =>
             {
                 try
                 {
-                    OnDeleteDocumentById?.Invoke(JsonConvert.DeserializeObject<StatusResponse>(status), userName);
+                    OnDeleteDocumentById?.Invoke(status, userName);
                 }
                 catch
                 {
@@ -474,11 +477,11 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<int, string, int?, string, string>("CreateShape", (docId, shape, shapeId, userName, status) =>
+            _connection.On<Shape, StatusResponse>("CreateShape", (shape, status) =>
             {
                 try
                 {
-                    OnCreateShape?.Invoke(docId, JsonConvert.DeserializeObject<Shape>(shape), shapeId, userName, JsonConvert.DeserializeObject<StatusResponse>(status));
+                    OnCreateShape?.Invoke(shape, status);
                 }
                 catch
                 {
@@ -486,11 +489,11 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<int, string, int?, string, string>("UpdateShape", (docId, shape, shapeId, userName, status) =>
+            _connection.On<Shape, StatusResponse>("UpdateShape", (shape, status) =>
             {
                 try
                 {
-                    OnUpdateShape?.Invoke(docId, JsonConvert.DeserializeObject<Shape>(shape), shapeId, userName, JsonConvert.DeserializeObject<StatusResponse>(status));
+                    OnUpdateShape?.Invoke(shape, status);
                 }
                 catch
                 {
@@ -498,11 +501,11 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<int, int?, string, string>("DeleteShape", (docId, shapeId, userName, status) =>
+            _connection.On<Shape, StatusResponse>("DeleteShape", (shape, status) =>
             {
                 try
                 {
-                    OnDeleteShape?.Invoke(docId, shapeId, userName, JsonConvert.DeserializeObject<StatusResponse>(status));
+                    OnDeleteShape?.Invoke(shape, status);
                 }
                 catch
                 {
@@ -518,8 +521,8 @@ namespace SingleRClient
         public delegate void GetDocumentById(Document doc, string userName);
         public delegate void CreateDocument(int docId, string userName, StatusResponse status);
         public delegate void DeleteDocumentById(StatusResponse status, string userName);
-        public delegate void CreateShape(int docId, Shape shape, int? shapeId, string userName, StatusResponse status);
-        public delegate void UpdateShape(int docId, Shape shape, int? shapeId, string userName, StatusResponse status);
-        public delegate void DeleteShape(int docId, int? shapeId, string userName, StatusResponse status);
+        public delegate void CreateShape(Shape shape, StatusResponse status);
+        public delegate void UpdateShape(Shape shape, StatusResponse status);
+        public delegate void DeleteShape(Shape shape, StatusResponse status);
     }
 }
