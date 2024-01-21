@@ -241,18 +241,18 @@ public partial class MainWindow : Window
     // Last point where context menu was been opened
     private Point LastContextMenuPoint;
 
-    private void ProtocolCreateShape(int docId, Protocol.Common.Shape shape, int? shapeId, string userName, StatusResponse status)
+    private void ProtocolCreateShape(Protocol.Common.Shape shape, StatusResponse status)
     {
-        if (Context.Document == null || docId != Context.Document.Header.Id)
+        if (Context.Document == null || shape?.DocumentId != Context.Document.Header.Id)
             return;
 
         AddUIShape(shape);
         Context.Document.Body.Add(shape);
     }
 
-    private void ProtocolUpdateShape(int docId, Protocol.Common.Shape shape, int? shapeId, string userName, StatusResponse status)
+    private void ProtocolUpdateShape(Protocol.Common.Shape shape, StatusResponse status)
     {
-        if (Context.Document == null || docId != Context.Document.Header.Id)
+        if (Context.Document == null || shape?.DocumentId != Context.Document.Header.Id)
             return;
 
         RemoveShape(shape.Id);
@@ -262,13 +262,13 @@ public partial class MainWindow : Window
         Context.Document.Body.Add(shape);
     }
 
-    private void ProtocolDeleteShape(int docId, int? shapeId, string userName, StatusResponse status)
+    private void ProtocolDeleteShape(Protocol.Common.Shape shape, StatusResponse status)
     {
-        if (Context.Document == null || docId != Context.Document.Header.Id || !shapeId.HasValue)
+        if (Context.Document == null || shape == null || shape.DocumentId != Context.Document.Header.Id)
             return;
 
-        RemoveShape(shapeId.Value);
-        Context.Document.Body.RemoveAll(x => x.Id == shapeId.Value);
+        RemoveShape(shape.Id);
+        Context.Document.Body.RemoveAll(x => x.Id == shape.Id);
     }
 
     private void RemoveShape(int id)
