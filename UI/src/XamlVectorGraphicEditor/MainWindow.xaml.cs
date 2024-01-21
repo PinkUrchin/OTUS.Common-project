@@ -241,18 +241,18 @@ public partial class MainWindow : Window
     // Last point where context menu was been opened
     private Point LastContextMenuPoint;
 
-    private void ProtocolCreateShape(int docId, Protocol.Common.Shape shape, int? shapeId, string userName, StatusResponse status)
+    private void ProtocolCreateShape(Protocol.Common.Shape shape, StatusResponse status)
     {
-        if (Context.Document == null || docId != Context.Document.Header.Id)
+        if (Context.Document == null || shape?.DocumentId != Context.Document.Header.Id)
             return;
 
         AddUIShape(shape);
         Context.Document.Body.Add(shape);
     }
 
-    private void ProtocolUpdateShape(int docId, Protocol.Common.Shape shape, int? shapeId, string userName, StatusResponse status)
+    private void ProtocolUpdateShape(Protocol.Common.Shape shape, StatusResponse status)
     {
-        if (Context.Document == null || docId != Context.Document.Header.Id)
+        if (Context.Document == null || shape?.DocumentId != Context.Document.Header.Id)
             return;
 
         RemoveShape(shape.Id);
@@ -262,13 +262,13 @@ public partial class MainWindow : Window
         Context.Document.Body.Add(shape);
     }
 
-    private void ProtocolDeleteShape(int docId, int? shapeId, string userName, StatusResponse status)
+    private void ProtocolDeleteShape(Protocol.Common.Shape shape, StatusResponse status)
     {
-        if (Context.Document == null || docId != Context.Document.Header.Id || !shapeId.HasValue)
+        if (Context.Document == null || shape == null || shape.DocumentId != Context.Document.Header.Id)
             return;
 
-        RemoveShape(shapeId.Value);
-        Context.Document.Body.RemoveAll(x => x.Id == shapeId.Value);
+        RemoveShape(shape.Id);
+        Context.Document.Body.RemoveAll(x => x.Id == shape.Id);
     }
 
     private void RemoveShape(int id)
@@ -289,7 +289,7 @@ public partial class MainWindow : Window
         protocolShape.Coords = JsonConvert.SerializeObject(shape.CreateDTO());
         protocolShape.UpdateDate = DateTime.Now;
         protocolShape.UpdateAuthor = Context.UserName;
-        await Context.DataProvider().UpdateShapeAsync(Context.Document.Header.Id, protocolShape, Context.UserName);
+        await Context.DataProvider().UpdateShapeAsync(protocolShape, Context.UserName);
     }
 
     private async void ShapeChanged(AbstractShape shape)
@@ -300,7 +300,7 @@ public partial class MainWindow : Window
     private async Task<bool> AddShape(AbstractShape shape)
     {
         var protocolShape = shape.CreateProtocolShape();
-        var result = await Context.DataProvider().CreateShapeAsync(Context.Document.Header.Id, protocolShape, Context.UserName);
+        var result = await Context.DataProvider().CreateShapeAsync(protocolShape, Context.UserName);
         if (result.Item2.Status == Status.Success)
         {
             shape.Id = result.Item1.Value;

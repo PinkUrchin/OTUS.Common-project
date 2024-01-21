@@ -261,14 +261,14 @@ namespace XamlVectorGraphicEditor
         /// <param name="shape">Shape object</param>
         /// <param name="userName">User name</param>
         /// <returns>(Shape ID, status info)</returns>
-        public Task<(int?, StatusResponse)> CreateShapeAsync(int docId, Shape shape, string userName)
+        public Task<(int?, StatusResponse)> CreateShapeAsync(Shape shape, string userName)
         {
             return Task.Run(() =>
             {
                 Delay();
                 lock (_lock)
                 {
-                    if (_docs.TryGetValue(docId, out var d))
+                    if (_docs.TryGetValue(shape.DocumentId, out var d))
                     {
                         var s = JsonConvert.SerializeObject(shape);
                         var newShape = JsonConvert.DeserializeObject<Shape>(s);
@@ -284,7 +284,7 @@ namespace XamlVectorGraphicEditor
                     }
                     else
                     {
-                        return ((int?)null, new StatusResponse { Status = Status.Failure, Description = $"Document [{docId}] not found" });
+                        return ((int?)null, new StatusResponse { Status = Status.Failure, Description = $"Document [{shape.DocumentId}] not found" });
                     }
                 }
             });
@@ -302,14 +302,14 @@ namespace XamlVectorGraphicEditor
         /// <param name="shape">Shape object</param>
         /// <param name="userName">User name</param>
         /// <returns>Status info</returns>
-        public Task<StatusResponse> UpdateShapeAsync(int docId, Shape shape, string userName)
+        public Task<StatusResponse> UpdateShapeAsync(Shape shape, string userName)
         {
             return Task.Run(() =>
             {
                 Delay();
                 lock (_lock)
                 {
-                    if (_docs.TryGetValue(docId, out var d))
+                    if (_docs.TryGetValue(shape.DocumentId, out var d))
                     {
                         var index = d.Body.FindIndex(x => x.Id == shape.Id);
 
@@ -327,7 +327,7 @@ namespace XamlVectorGraphicEditor
                     }
                     else
                     {
-                        return new StatusResponse { Status = Status.Failure, Description = $"Document [{docId}] not found" };
+                        return new StatusResponse { Status = Status.Failure, Description = $"Document [{shape.DocumentId}] not found" };
                     }
                 }
             });
@@ -345,14 +345,14 @@ namespace XamlVectorGraphicEditor
         /// <param name="shape">Shape object</param>
         /// <param name="userName">User name</param>
         /// <returns>Status info</returns>
-        public Task<StatusResponse> DeleteShapeAsync(int docId, Shape shape, string userName)
+        public Task<StatusResponse> DeleteShapeAsync(Shape shape, string userName)
         {
             return Task.Run(() =>
             {
                 Delay();
                 lock (_lock)
                 {
-                    if (_docs.TryGetValue(docId, out var d))
+                    if (_docs.TryGetValue(shape.DocumentId, out var d))
                     {
                         var index = d.Body.FindIndex(x => x.Id == shape.Id);
 
@@ -369,7 +369,7 @@ namespace XamlVectorGraphicEditor
                     }
                     else
                     {
-                        return new StatusResponse { Status = Status.Failure, Description = $"Document [{docId}] not found" };
+                        return new StatusResponse { Status = Status.Failure, Description = $"Document [{shape.DocumentId}] not found" };
                     }
                 }
             });
@@ -415,7 +415,7 @@ namespace XamlVectorGraphicEditor
                 document.Header.UpdateAuthor = userName;
                 document.Header.UpdateDate = shape.UpdateDate;
 
-                OnCreateShape?.Invoke(docId, shape, shape.Id, userName, new StatusResponse { Status = Status.Success });
+                OnCreateShape?.Invoke(shape, new StatusResponse { Status = Status.Success });
             }
         }
 
@@ -438,7 +438,7 @@ namespace XamlVectorGraphicEditor
             document.Header.UpdateAuthor = shape.UpdateAuthor;
             document.Header.UpdateDate = shape.UpdateDate;
 
-            OnUpdateShape?.Invoke(docId, shape, shape.Id, shape.UpdateAuthor, new StatusResponse { Status = Status.Success });
+            OnUpdateShape?.Invoke(shape, new StatusResponse { Status = Status.Success });
         }
 
         public void TestDeleteShape(int docId)
@@ -455,7 +455,7 @@ namespace XamlVectorGraphicEditor
             document.Header.UpdateAuthor = shape.UpdateAuthor;
             document.Header.UpdateDate = shape.UpdateDate;
 
-            OnDeleteShape?.Invoke(docId, shape.Id, userName, new StatusResponse { Status = Status.Success });
+            OnDeleteShape?.Invoke(shape, new StatusResponse { Status = Status.Success });
         }
 
         #endregion
