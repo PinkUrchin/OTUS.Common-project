@@ -20,9 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="protocol">
-      <HintPath>..\ApiDB\proto\bin\Debug\net6.0\protocol.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\ApiDB\proto\protocol.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "otus", "otus\otus.csproj", "{E9AFF85F-EC0E-4734-8149-B5887C465C17}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{4C0859C8-2414-48F2-9823-F162D8CAC480}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRService", "SignalR Service\SignalRService.csproj", "{BFB08731-177A-4B64-A28F-700B78C66BA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRService", "SignalRService\SignalRService.csproj", "{BFB08731-177A-4B64-A28F-700B78C66BA0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "protocol", "ApiDB\proto\protocol.csproj", "{91F5CBC6-A8B3-48C9-A5D8-9A09C750B009}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E9AFF85F-EC0E-4734-8149-B5887C465C17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E9AFF85F-EC0E-4734-8149-B5887C465C17}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E9AFF85F-EC0E-4734-8149-B5887C465C17}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E9AFF85F-EC0E-4734-8149-B5887C465C17}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4C0859C8-2414-48F2-9823-F162D8CAC480}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4C0859C8-2414-48F2-9823-F162D8CAC480}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C0859C8-2414-48F2-9823-F162D8CAC480}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,6 +23,10 @@ Global
 		{BFB08731-177A-4B64-A28F-700B78C66BA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFB08731-177A-4B64-A28F-700B78C66BA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFB08731-177A-4B64-A28F-700B78C66BA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91F5CBC6-A8B3-48C9-A5D8-9A09C750B009}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91F5CBC6-A8B3-48C9-A5D8-9A09C750B009}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91F5CBC6-A8B3-48C9-A5D8-9A09C750B009}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91F5CBC6-A8B3-48C9-A5D8-9A09C750B009}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
