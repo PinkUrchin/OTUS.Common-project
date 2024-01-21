@@ -289,7 +289,7 @@ public partial class MainWindow : Window
         protocolShape.Coords = JsonConvert.SerializeObject(shape.CreateDTO());
         protocolShape.UpdateDate = DateTime.Now;
         protocolShape.UpdateAuthor = Context.UserName;
-        await Context.DataProvider().UpdateShapeAsync(Context.Document.Header.Id, protocolShape, Context.UserName);
+        await Context.DataProvider().UpdateShapeAsync(protocolShape, Context.UserName);
     }
 
     private async void ShapeChanged(AbstractShape shape)
@@ -300,7 +300,7 @@ public partial class MainWindow : Window
     private async Task<bool> AddShape(AbstractShape shape)
     {
         var protocolShape = shape.CreateProtocolShape();
-        var result = await Context.DataProvider().CreateShapeAsync(Context.Document.Header.Id, protocolShape, Context.UserName);
+        var result = await Context.DataProvider().CreateShapeAsync(protocolShape, Context.UserName);
         if (result.Item2.Status == Status.Success)
         {
             shape.Id = result.Item1.Value;

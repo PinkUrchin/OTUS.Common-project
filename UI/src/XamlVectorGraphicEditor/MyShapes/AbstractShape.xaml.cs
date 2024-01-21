@@ -50,7 +50,7 @@ abstract partial class AbstractShape : Border, ICloneable
         var shape = GetProtocolShape();
         if (shape != null)
         {
-            var result = await Context.DataProvider().DeleteShapeAsync(Context.Document.Header.Id, shape, Context.UserName);
+            var result = await Context.DataProvider().DeleteShapeAsync(shape, Context.UserName);
             canDelete = result.Status == Protocol.Common.Status.Success;
 
             if (canDelete)
