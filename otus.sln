@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32407.337
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "otus", "otus\otus.csproj", "{E9AFF85F-EC0E-4734-8149-B5887C465C17}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{4C0859C8-2414-48F2-9823-F162D8CAC480}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalR Service", "SignalR Service\SignalR Service.csproj", "{BFB08731-177A-4B64-A28F-700B78C66BA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRService", "SignalR Service\SignalRService.csproj", "{BFB08731-177A-4B64-A28F-700B78C66BA0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

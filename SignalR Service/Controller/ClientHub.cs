@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Protocol.Common;
 using SignalR_Service.Models;
 
 namespace SignalR_Service.Controller
@@ -51,7 +52,7 @@ namespace SignalR_Service.Controller
         [HttpDelete]
         public async Task DeleteDocumentById(int idDocument, string userName)
         {
-            var res = await _serializer.GetDocumentById(idDocument, userName);
+            var res = await _serializer.DeleteDocumentById(idDocument, userName);
             await Clients.All.SendAsync("DeleteDocumentById", res, userName);
         }
 
@@ -63,10 +64,10 @@ namespace SignalR_Service.Controller
         /// <param name="userName">Username</param>
         /// <returns>All info about operation</returns>
         [HttpPost]
-        public async Task CreateShape(int idDocument, string shapeInfo, string userName)
+        public async Task CreateShape(Shape shapeInfo, string userName)
         {
-            var res = await _serializer.CreateShape(idDocument, shapeInfo, userName);
-            await Clients.All.SendAsync("CreateShape", res, userName);
+            var res = await _serializer.CreateShape(shapeInfo.DocumentId, shapeInfo, userName);
+            await Clients.All.SendAsync("CreateShape", res.Item1, res.Item2);
         }
 
         /// <summary>
@@ -77,10 +78,10 @@ namespace SignalR_Service.Controller
         /// <param name="userName">Username</param>
         /// <returns>All info about operation</returns>
         [HttpPut]
-        public async Task UpdateShape(int idDocument, string shapeInfo, string userName)
+        public async Task UpdateShape(Shape shape, string userName)
         {
-            var res = await _serializer.UpdateShape(idDocument, shapeInfo, userName);
-            await Clients.All.SendAsync("UpdateShape ", res, userName);
+            var res = await _serializer.UpdateShape(shape.DocumentId, shape, userName);
+            await Clients.All.SendAsync("UpdateShape ", res.Item1, res.Item2);
         }
 
         /// <summary>
@@ -91,10 +92,10 @@ namespace SignalR_Service.Controller
         /// <param name="userName">Username</param>
         /// <returns>All info about operation</returns>
         [HttpDelete]
-        public async Task DeleteShape(int idDocument, string shapeInfo, string userName)
+        public async Task DeleteShape(Shape shape, string userName)
         {
-            var res = await _serializer.DeleteShape(idDocument, shapeInfo, userName);
-            await Clients.All.SendAsync("DeleteShape", res, userName);
+            var res = await _serializer.DeleteShape(shape, userName);
+            await Clients.All.SendAsync("DeleteShape", res.Item1, res.Item2);
         }
     }
 }
