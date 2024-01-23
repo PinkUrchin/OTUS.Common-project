@@ -20,7 +20,7 @@ namespace SignalR_Service.Models
 
         public Client()
         {
-            var factory = new ConnectionFactory { HostName = "85.193.81.154:15672" };
+            var factory = new ConnectionFactory { HostName = "85.193.81.154" };
 
             connection = factory.CreateConnection();
             channel = connection.CreateModel();

@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 using Newtonsoft.Json;
+using protocol.Requests;
 using Protocol.Common;
 using SignalR_Service.ModelsRequests;
 
@@ -14,7 +15,9 @@ namespace SignalR_Service.Models
         }
         public async Task<Document> CreateDocument(string name, string userName)
         {
-            RequestDocumentName requestDocument = new RequestDocumentName(userName, name);
+            CreateDocumentRequest requestDocument = new CreateDocumentRequest();
+            requestDocument.DocumentName = name;
+            requestDocument.UserName = userName;
             var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestDocument));
             var baseResponse = BaseResponse.ReadResponse(response);
             var doc = baseResponse as Document;
@@ -23,7 +26,12 @@ namespace SignalR_Service.Models
 
         public async Task<(Shape, StatusResponse)> CreateShape(int idDocument, Shape shapeInfo, string userName)
         {
-            RequestShape requestShape = new RequestShape(userName, idDocument, shapeInfo);
+            ShapeRequest requestShape = new ShapeRequest();
+            requestShape.CreateAuthor = userName;
+            requestShape.DocumentId = idDocument;
+            requestShape.Coords = shapeInfo.Coords;
+            requestShape.Color = shapeInfo.Color;
+            requestShape.ShapeType = shapeInfo.ShapeType;
             var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestShape));
             var baseResponse = BaseResponse.ReadResponse(response);
             var shape = baseResponse as Shape;
@@ -33,8 +41,10 @@ namespace SignalR_Service.Models
 
         public async Task<StatusResponse> DeleteDocumentById(int idDocument, string userName)
         {
-            RequestDocument requestDocument = new RequestDocument(userName, idDocument);
-            var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestDocument));
+            DeleteDocumentByIdRequest requestDeleteDocument = new DeleteDocumentByIdRequest();
+            requestDeleteDocument.DocumentId = idDocument;
+            requestDeleteDocument.UserName = userName;
+            var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestDeleteDocument));
             var baseResponse = BaseResponse.ReadResponse(response);
             var status = baseResponse as StatusResponse;
             return status;
@@ -42,8 +52,10 @@ namespace SignalR_Service.Models
 
         public async Task<(Shape, StatusResponse)> DeleteShape(Shape shape, string userName)
         {
-            RequestShape requestShape = new RequestShape(userName, shape.DocumentId, shape);
-            var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestShape));
+            DeleteShapeRequest requestDeleteShape = new DeleteShapeRequest();
+            requestDeleteShape.UserName = userName;
+            requestDeleteShape.Id = shape.Id;
+            var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestDeleteShape));
             var baseResponse = BaseResponse.ReadResponse(response);
             var shapeRes = baseResponse as Shape;
             var status = baseResponse as StatusResponse;
@@ -52,7 +64,9 @@ namespace SignalR_Service.Models
 
         public async Task<Document> GetDocumentById(int idDocument, string userName)
         {
-            RequestDocument requestDocument = new RequestDocument(userName, idDocument);
+            GetDocumentByIdRequest requestDocument = new GetDocumentByIdRequest();
+            requestDocument.DocumentId = idDocument;
+            requestDocument.UserName = userName;
             var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestDocument));
             var baseResponse = BaseResponse.ReadResponse(response);
             var doc = baseResponse as Document;
@@ -61,8 +75,9 @@ namespace SignalR_Service.Models
 
         public async Task<DocumentList> GetListDocuments(string userName)
         {
-            RequestUser requestUser = new RequestUser(userName);
-            var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestUser));
+            GetListDocumentsRequest requestListDocuments = new GetListDocumentsRequest();
+            requestListDocuments.UserName = userName;
+            var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestListDocuments));
             var baseResponse = BaseResponse.ReadResponse(response);
             var doc = baseResponse as DocumentList;
             return doc;
@@ -70,8 +85,16 @@ namespace SignalR_Service.Models
 
         public async Task<(Shape, StatusResponse)> UpdateShape(int idDocument, Shape shapeInfo, string userName)
         {
-            RequestShape requestShape = new RequestShape(userName, idDocument, shapeInfo);
-            var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestShape));
+            ShapeRequest requestUpdateShape = new ShapeRequest();
+            requestUpdateShape.ShapeType = shapeInfo.ShapeType;
+            requestUpdateShape.Coords = shapeInfo.Coords;
+            requestUpdateShape.Color = shapeInfo.Color;
+            requestUpdateShape.UpdateAuthor = userName;
+            requestUpdateShape.CreateAuthor = shapeInfo.CreateAuthor;
+            requestUpdateShape.CreateDate = shapeInfo.CreateDate;
+            requestUpdateShape.DocumentId = idDocument;
+            requestUpdateShape.Id = shapeInfo.Id;
+            var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestUpdateShape));
             var baseResponse = BaseResponse.ReadResponse(response);
             var shape = baseResponse as Shape;
             var status = baseResponse as StatusResponse;
