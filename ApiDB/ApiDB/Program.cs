@@ -23,7 +23,7 @@ namespace BDService
             {
                 Name = "doc_db",
                 Queue = "doc_db",
-                Server = "85.193.81.154:15672",
+                Server = "85.193.81.154",
                 Login = "guest",
                 Password = "guest",
                 NoAck = false,

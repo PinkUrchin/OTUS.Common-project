@@ -18,7 +18,7 @@ namespace ApiDB.Client
 
         public Client()
         {
-            var factory = new ConnectionFactory { HostName = "localhost" };
+            var factory = new ConnectionFactory { HostName = "85.193.81.154" };
 
             connection = factory.CreateConnection();
             channel = connection.CreateModel();
