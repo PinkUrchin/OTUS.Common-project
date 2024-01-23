@@ -21,7 +21,6 @@ namespace apidb
             try
             {
                 var docs = DbCtx.dw_documents.ToList();
-
                 var result = new DocumentList
                 {
                     Documents = docs.Select(x => new DocumentHeader()

@@ -34,9 +34,9 @@ namespace apidb
                     DbCtx.dw_documents.Remove(tmp_doc);
                     DbCtx.SaveChanges();
                 }
-
-                var result = JsonConvert.SerializeObject(new StatusResponse() { Status = Status.Success, Description = "ok" });
-                return Task.FromResult(JsonConvert.SerializeObject(result));
+                var response = new StatusResponse() { Status = Status.Success, Description = "ok" };
+                var result = JsonConvert.SerializeObject(response);
+                return Task.FromResult(result);
             }
             catch (Exception ex)
             {

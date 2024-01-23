@@ -17,7 +17,7 @@ namespace apidb
         public Task<string> HandleRequest(IRequest req)
         {
             var request = req as IShapeRequest;
-
+            var date = DateTime.Now.ToUniversalTime();
             try
             {
                 var tmp = DbCtx.dw_shapes.Where(x => x.Id == request.Id).FirstOrDefault();
@@ -25,7 +25,7 @@ namespace apidb
                 if (tmp != null)
                 {
                     tmp.ShapeType = (ShapeTypeEnum)request.ShapeType;
-                    tmp.UpdateDate = request.UpdateDate;
+                    tmp.UpdateDate = date;
                     tmp.UpdateAuthor = request.UpdateAuthor;
                     tmp.Color = request.Color;
                     tmp.Coords = request.Coords;
@@ -34,7 +34,7 @@ namespace apidb
                 }
 
                 var result = JsonConvert.SerializeObject(new StatusResponse() { Status = Status.Success, Description = "ok" });
-                return Task.FromResult(JsonConvert.SerializeObject(result));
+                return Task.FromResult(result);
             }
             catch (Exception ex)
             {

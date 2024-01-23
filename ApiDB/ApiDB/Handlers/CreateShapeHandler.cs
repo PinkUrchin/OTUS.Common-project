@@ -29,8 +29,8 @@ namespace apidb
             {
                 DocumentId = request.DocumentId,
                 ShapeType = (ShapeTypeEnum)request.ShapeType,
-                CreateDate = request.CreateDate,
-                UpdateDate = request.UpdateDate,
+                CreateDate = date,
+                UpdateDate = date,
                 CreateAuthor = request.CreateAuthor,
                 UpdateAuthor = request.UpdateAuthor,
                 Color= request.Color,

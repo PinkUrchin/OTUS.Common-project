@@ -29,7 +29,7 @@ namespace apidb
                 }
 
                 var result = JsonConvert.SerializeObject(new StatusResponse() { Status = Status.Success, Description = "ok" });
-                return Task.FromResult(JsonConvert.SerializeObject(result));
+                return Task.FromResult(result);
             }
             catch (Exception ex) 
             {
