@@ -178,7 +178,7 @@ namespace SingleRClient
         /// </summary>
         /// <param name="userName">User name</param>
         /// <returns>Documents headers list</returns>
-        public async Task<DocumentList> GetDocumentsListAsync(string userName)
+        public Task<DocumentList> GetDocumentsListAsync(string userName)
         {
             var tcs = new TaskCompletionSource<DocumentList>();
             OnGetListDocuments = (documentsList, userName) =>
@@ -186,7 +186,7 @@ namespace SingleRClient
                 tcs.SetResult(documentsList);
             };
 
-            await Task.Run(() =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -198,7 +198,7 @@ namespace SingleRClient
                 }
             });
 
-            return await tcs.Task;
+            return tcs.Task;
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace SingleRClient
         /// <param name="documentId">ID Document</param>
         /// <param name="userName">User name</param>
         /// <returns>Document object with document info</returns>
-        public async Task<Document> GetDocumentByIdAsync(int documentId, string userName)
+        public Task<Document> GetDocumentByIdAsync(int documentId, string userName)
         {
             var tcs = new TaskCompletionSource<Document>();
             OnGetDocumentById = (doc, userName) =>
@@ -215,7 +215,7 @@ namespace SingleRClient
                 tcs.SetResult(doc);
             };
 
-            await Task.Run(() =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -227,7 +227,7 @@ namespace SingleRClient
                 }
             });
 
-            return await tcs.Task;
+            return tcs.Task;
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace SingleRClient
         /// <param name="docName">Document name</param>
         /// <param name="userName">User name</param>
         /// <returns>(Document id, status info)</returns>
-        public async Task<(int, StatusResponse)> CreateDocumentAsync(string docName, string userName)
+        public Task<(int, StatusResponse)> CreateDocumentAsync(string docName, string userName)
         {
             var tcs = new TaskCompletionSource<(int, StatusResponse)>();
             OnCreateDocument = (docId, userName, status) =>
@@ -244,7 +244,7 @@ namespace SingleRClient
                 tcs.SetResult((docId, status));
             };
 
-            await Task.Run(() =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -256,7 +256,7 @@ namespace SingleRClient
                 }
             });
 
-            return await tcs.Task;
+            return tcs.Task;
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace SingleRClient
         /// <param name="docId">Document ID</param>
         /// <param name="userName">User name</param>
         /// <returns>Status info</returns>
-        public async Task<StatusResponse> DeleteDocumentByIdAsync(int docId, string userName)
+        public Task<StatusResponse> DeleteDocumentByIdAsync(int docId, string userName)
         {
             var tcs = new TaskCompletionSource<StatusResponse>();
             OnDeleteDocumentById = (status, userName) =>
@@ -273,7 +273,7 @@ namespace SingleRClient
                 tcs.SetResult(status);
             };
 
-            await Task.Run(() =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -285,7 +285,7 @@ namespace SingleRClient
                 }
             });
 
-            return await tcs.Task;
+            return tcs.Task;
         }
 
         /// <summary>
@@ -295,7 +295,7 @@ namespace SingleRClient
         /// <param name="shape">Shape object</param>
         /// <param name="userName">User name</param>
         /// <returns>(Shape ID, status info)</returns>
-        public async Task<(int?, StatusResponse)> CreateShapeAsync(Shape shape, string userName)
+        public Task<(int?, StatusResponse)> CreateShapeAsync(Shape shape, string userName)
         {
             var tcs = new TaskCompletionSource<(int?, StatusResponse)>();
             OnCreateShape = (shape, status) =>
@@ -303,7 +303,7 @@ namespace SingleRClient
                 tcs.SetResult((shape.Id, status));
             };
 
-            await Task.Run(() =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -315,7 +315,7 @@ namespace SingleRClient
                 }
             });
 
-            return await tcs.Task;
+            return tcs.Task;
         }
 
         /// <summary>
@@ -325,7 +325,7 @@ namespace SingleRClient
         /// <param name="shape">Shape object</param>
         /// <param name="userName">User name</param>
         /// <returns>Status info</returns>
-        public async Task<StatusResponse> UpdateShapeAsync(Shape shape, string userName)
+        public Task<StatusResponse> UpdateShapeAsync(Shape shape, string userName)
         {
             var tcs = new TaskCompletionSource<StatusResponse>();
             OnUpdateShape = (shape, status) =>
@@ -333,7 +333,7 @@ namespace SingleRClient
                 tcs.SetResult(status);
             };
 
-            await Task.Run(() =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -345,7 +345,7 @@ namespace SingleRClient
                 }
             });
 
-            return await tcs.Task;
+            return tcs.Task;
         }
 
         /// <summary>
@@ -355,7 +355,7 @@ namespace SingleRClient
         /// <param name="shape">Shape object</param>
         /// <param name="userName">User name</param>
         /// <returns>Status info</returns>
-        public async Task<StatusResponse> DeleteShapeAsync(Shape shape, string userName)
+        public Task<StatusResponse> DeleteShapeAsync(Shape shape, string userName)
         {
             var tcs = new TaskCompletionSource<StatusResponse>();
             OnDeleteShape = (shapeId, status) =>
@@ -363,7 +363,7 @@ namespace SingleRClient
                 tcs.SetResult(status);
             };
 
-            await Task.Run(() =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -375,7 +375,7 @@ namespace SingleRClient
                 }
             });
 
-            return await tcs.Task;
+            return tcs.Task;
         }
 
         private void InitConnection()
