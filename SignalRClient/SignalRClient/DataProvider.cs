@@ -118,7 +118,7 @@ namespace SingleRClient
         private DataProvider()
         {
             _connection = new HubConnectionBuilder()
-                .WithUrl("https://85.193.81.154:8088/document")
+                .WithUrl("http://85.193.81.154:8088/document")
                 .WithAutomaticReconnect()
                 .Build();
 
