@@ -48,6 +48,6 @@ namespace Protocol.Common
         [JsonProperty("coords")]
         public string Coords { get; set; }
 
-        public ShapeRequest() : base(Actions.CreateDocument) { }
+        public ShapeRequest() : base(Actions.CreateShape) { }
     }
 }
