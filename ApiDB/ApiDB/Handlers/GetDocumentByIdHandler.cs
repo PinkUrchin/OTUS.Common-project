@@ -22,7 +22,7 @@ namespace apidb
             try
             {
                 var doc = DbCtx.dw_documents.Where(x => x.Id == request.DocumentId).FirstOrDefault();
-                var shapes = DbCtx.dw_shapes.Where(x => x.Id == request.DocumentId).ToList();
+                var shapes = DbCtx.dw_shapes.Where(x => x.DocumentId == request.DocumentId).ToList();
 
                 var result = new Document
                 {

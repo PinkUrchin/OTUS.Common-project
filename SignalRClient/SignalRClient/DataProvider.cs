@@ -118,9 +118,11 @@ namespace SingleRClient
         private DataProvider()
         {
             _connection = new HubConnectionBuilder()
-                .WithUrl("http://85.193.81.154:8088/document")
+                //.WithUrl("http://85.193.81.154:8088/document")
+                .WithUrl("http://localhost:32781/document")
                 .WithAutomaticReconnect()
                 .Build();
+            //_connection.ServerTimeout = TimeSpan.MaxValue;
 
             InitConnection();
             RegisterFunctions();
@@ -300,14 +302,14 @@ namespace SingleRClient
             var tcs = new TaskCompletionSource<(int?, StatusResponse)>();
             OnCreateShape = (shape, status) =>
             {
-                tcs.SetResult((shape.Id, status));
+                tcs.SetResult((shape?.Id, status));
             };
 
             Task.Run(() =>
             {
                 try
                 {
-                    _connection.InvokeAsync("CreateShape", JsonConvert.SerializeObject(shape), userName);
+                    _connection.InvokeAsync("CreateShape", shape, userName);
                 }
                 catch (Exception ex)
                 {
@@ -367,7 +369,7 @@ namespace SingleRClient
             {
                 try
                 {
-                    _connection.InvokeAsync("UpdateShape", JsonConvert.SerializeObject(shape), userName);
+                    _connection.InvokeAsync("DeleteShape", shape, userName);
                 }
                 catch (Exception ex)
                 {
@@ -415,7 +417,7 @@ namespace SingleRClient
                 {
                     return false;
                 }
-                catch
+                catch (Exception ex)
                 {
                     // Failed to connect, trying again in 5000 ms.
                     await Task.Delay(5000);
@@ -432,7 +434,7 @@ namespace SingleRClient
 
                     OnGetListDocuments?.Invoke(list, userName);
                 }
-                catch
+                catch (Exception ex)
                 {
                     //TODO logger
                 }
@@ -444,7 +446,7 @@ namespace SingleRClient
                 {
                     OnGetDocumentById?.Invoke(doc, userName);
                 }
-                catch
+                catch (Exception ex)
                 {
                     //TODO logger
                 }
@@ -456,7 +458,7 @@ namespace SingleRClient
                 {
                     OnCreateDocument?.Invoke(document.Header.Id, document.Header.UserName, status);
                 }
-                catch
+                catch (Exception ex)
                 {
                     //TODO logger
                 }
@@ -468,7 +470,7 @@ namespace SingleRClient
                 {
                     OnDeleteDocumentById?.Invoke(status, userName);
                 }
-                catch
+                catch (Exception ex)
                 {
                     //TODO logger
                 }
@@ -480,7 +482,7 @@ namespace SingleRClient
                 {
                     OnCreateShape?.Invoke(shape, status);
                 }
-                catch
+                catch (Exception ex)
                 {
                     //TODO logger
                 }
