@@ -89,7 +89,7 @@ namespace SignalR_Service.Models
             UpdateShapeRequest requestUpdateShape = new UpdateShapeRequest();
             requestUpdateShape.ShapeType = shapeInfo.ShapeType;
             requestUpdateShape.Coords = shapeInfo.Coords;
-            requestUpdateShape.Color = shapeInfo.Color;
+            requestUpdateShape.Color = "1";
             requestUpdateShape.UpdateAuthor = userName;
             requestUpdateShape.CreateAuthor = shapeInfo.CreateAuthor;
             requestUpdateShape.CreateDate = shapeInfo.CreateDate;
