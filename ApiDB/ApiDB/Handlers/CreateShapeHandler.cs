@@ -47,10 +47,10 @@ namespace apidb
                     x.ShapeType == tmp.ShapeType && 
                     x.CreateDate == tmp.CreateDate &&
                     x.UpdateDate == tmp.UpdateDate &&
-                    x.CreateAuthor == tmp.CreateAuthor &&
-                    x.UpdateAuthor == tmp.UpdateAuthor &&
-                    x.Color == tmp.Color &&
-                    x.Coords == tmp.Coords
+                    x.CreateAuthor == tmp.CreateAuthor// &&
+                    //x.UpdateAuthor == tmp.UpdateAuthor &&
+                    //x.Color == tmp.Color &&
+                    //x.Coords == tmp.Coords
                 ).FirstOrDefault();
 
                 var result = new Shape

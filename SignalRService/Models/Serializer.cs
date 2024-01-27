@@ -28,9 +28,10 @@ namespace SignalR_Service.Models
         {
             ShapeRequest requestShape = new ShapeRequest();
             requestShape.CreateAuthor = userName;
+            requestShape.UpdateAuthor = userName;
             requestShape.DocumentId = idDocument;
             requestShape.Coords = shapeInfo.Coords;
-            requestShape.Color = shapeInfo.Color;
+            requestShape.Color = "1";
             requestShape.ShapeType = shapeInfo.ShapeType;
             var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestShape));
             var baseResponse = BaseResponse.ReadResponse(response);
@@ -85,7 +86,7 @@ namespace SignalR_Service.Models
 
         public async Task<(Shape, StatusResponse)> UpdateShape(int idDocument, Shape shapeInfo, string userName)
         {
-            ShapeRequest requestUpdateShape = new ShapeRequest();
+            UpdateShapeRequest requestUpdateShape = new UpdateShapeRequest();
             requestUpdateShape.ShapeType = shapeInfo.ShapeType;
             requestUpdateShape.Coords = shapeInfo.Coords;
             requestUpdateShape.Color = shapeInfo.Color;
