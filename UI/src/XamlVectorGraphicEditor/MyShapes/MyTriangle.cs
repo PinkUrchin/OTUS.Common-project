@@ -34,6 +34,7 @@ class MyTriangle : AbstractShape
         ret.RenderTransform = RenderTransform;
         ret.LayoutTransform = LayoutTransform;
         ret.BorderBrush = BorderBrush;
+        ret.UserName = UserName;
 
         var otherShape = Child as Shape;
         Shape newShape = ret.Child as Shape;

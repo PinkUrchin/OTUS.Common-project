@@ -201,8 +201,7 @@ public partial class MainWindow : Window
             if ((new_width > 0) && (new_height > 0))
             {
                 // Update the rectangle.
-                Canvas.SetLeft(CurrentObject, new_x);
-                Canvas.SetTop(CurrentObject, new_y);
+                CurrentObject.UpdatePosition(new_x, new_y);
                 CurrentObject.Width = new_width;
                 CurrentObject.Height = new_height;
 
@@ -278,7 +277,10 @@ public partial class MainWindow : Window
             for (int i = MainCanvas.Children.Count - 1; i >= 0; i--)
             {
                 if (MainCanvas.Children[i] is AbstractShape shape && shape.Id == id)
-                    MainCanvas.Children.RemoveAt(i);
+                {
+                    shape.RemoveFromCanvas(MainCanvas);
+                    break;
+                }
             }
         });
     }
@@ -438,9 +440,10 @@ public partial class MainWindow : Window
         {
             var uiShape = ShapeFactory.CreateShape(shape);
             if (uiShape is AbstractShape aShape)
+            {
                 aShape.Changed = ShapeChanged;
-
-            MainCanvas.Children.Add(uiShape);
+                aShape.AddToCanvas(MainCanvas);
+            }
         });
     }
 

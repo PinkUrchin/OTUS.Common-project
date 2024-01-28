@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,19 @@ abstract partial class AbstractShape : Border, ICloneable
     private static AbstractShape Top;
     private static int LastZIndex;
     private double CurrentRotate = 0;
+    private Label _lbl;
+
+    public void AddToCanvas(Canvas canvas)
+    {
+        canvas.Children.Add(this);
+        canvas.Children.Add(_lbl);
+    }
+
+    public void RemoveFromCanvas(Canvas canvas)
+    {
+        canvas.Children.Remove(this);
+        canvas.Children.Remove(_lbl);
+    }
 
     private void RectMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
@@ -32,6 +46,8 @@ abstract partial class AbstractShape : Border, ICloneable
         }
         Top = this;
         Canvas.SetZIndex(this, ++LastZIndex);
+        Canvas.SetZIndex(_lbl, LastZIndex);
+
         CaptureMouse();
         BorderThickness = new Thickness(2);
         BorderBrush = Brushes.Red;
@@ -90,16 +106,19 @@ abstract partial class AbstractShape : Border, ICloneable
 
     private void Right90Click(object sender, RoutedEventArgs e) => Rotate(90);
 
-    private void CloneClick(object sender, RoutedEventArgs e) =>
-        (VisualParent as Canvas).Children.Add(Copy());
+    private void CloneClick(object sender, RoutedEventArgs e)
+    {
+        Copy().AddToCanvas(VisualParent as Canvas);
+    }
 
     public AbstractShape(in Point whereSetMe, in Shape shape)
     {
         InitializeComponent();
         Child = shape;
         ContextMenu.AddPaletteHeader(new ShapeBackgroundChanger(shape, () => Changed?.Invoke(this)));
-        Canvas.SetLeft(this, whereSetMe.X);
-        Canvas.SetTop(this, whereSetMe.Y);
+
+        _lbl = new Label();
+        UpdatePosition(whereSetMe.X, whereSetMe.Y);
         LastZIndex = Canvas.GetZIndex(this);
     }
 
@@ -122,8 +141,18 @@ abstract partial class AbstractShape : Border, ICloneable
         var shape = Context.Document.Body.Find(x => x.Id == Id);
         return shape;   
     }
-    
-    public string UserName { get; set; }
+
+    private string _userName;
+    public string UserName
+    {
+        get => _userName;
+        set
+        {
+            _userName = value;
+            _lbl.Content = _userName;
+        }
+    }
+
     public Color FillColor
     {
         get
@@ -143,9 +172,17 @@ abstract partial class AbstractShape : Border, ICloneable
         get => new Point(Canvas.GetLeft(this), Canvas.GetTop(this));
         set
         {
-            Canvas.SetLeft(this, value.X);
-            Canvas.SetTop(this, value.Y);
+            UpdatePosition(value.X, value.Y);
         }
+    }
+
+    public void UpdatePosition(double x, double y)
+    {
+        Canvas.SetLeft(this, x);
+        Canvas.SetTop(this, y);
+
+        Canvas.SetLeft(_lbl, x);
+        Canvas.SetTop(_lbl, y - 23);
     }
 
     public abstract object Clone();
