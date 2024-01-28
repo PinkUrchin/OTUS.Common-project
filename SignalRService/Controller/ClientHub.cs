@@ -40,7 +40,7 @@ namespace SignalR_Service.Controller
         public async Task CreateDocument(string name, string userName, Guid guid)
         {
             var res = await _serializer.CreateDocument(name, userName);
-            await Clients.All.SendAsync("CreateDocument", res, userName, guid);
+            await Clients.All.SendAsync("CreateDocument", res.Item1, res.Item2, guid);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace SignalR_Service.Controller
         public async Task UpdateShape(Shape shape, string userName, Guid guid)
         {
             var res = await _serializer.UpdateShape(shape.DocumentId, shape, userName);
-            await Clients.All.SendAsync("UpdateShape ", res.Item1, res.Item2, guid);
+            await Clients.All.SendAsync("UpdateShape", res.Item1, res.Item2, guid);
         }
 
         /// <summary>

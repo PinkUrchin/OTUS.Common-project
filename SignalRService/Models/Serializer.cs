@@ -13,7 +13,7 @@ namespace SignalR_Service.Models
         { 
             RpcHelper = new RpcHelper();
         }
-        public async Task<Document> CreateDocument(string name, string userName)
+        public async Task<(Document, StatusResponse)> CreateDocument(string name, string userName)
         {
             CreateDocumentRequest requestDocument = new CreateDocumentRequest();
             requestDocument.DocumentName = name;
@@ -21,7 +21,10 @@ namespace SignalR_Service.Models
             var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestDocument));
             var baseResponse = BaseResponse.ReadResponse(response);
             var doc = baseResponse as Document;
-            return doc;
+            var status = baseResponse as StatusResponse;
+            if (doc != null && status == null)
+                status = new StatusResponse() { Status = Status.Success };
+            return (doc, status);
         }
 
         public async Task<(Shape, StatusResponse)> CreateShape(int idDocument, Shape shapeInfo, string userName)
