@@ -4,11 +4,10 @@ using System.Drawing;
 namespace DataProvider
 {
     public enum ShapeTypeEnum
-    { 
-        Point = 0,
-        Line = 1, 
-        Polygon = 2,
-        Ellipse = 3
+    {
+        Rectangle = 0,
+        Ellipse = 1,
+        Triangle = 2
     }
     
     public class dw_shape

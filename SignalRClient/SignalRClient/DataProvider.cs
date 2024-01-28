@@ -10,6 +10,7 @@ using Protocol.Common;
 using Newtonsoft.Json;
 using static SingleRClient.DataProvider;
 using System.Security.Cryptography;
+using System.Collections.Concurrent;
 
 namespace SingleRClient
 {
@@ -28,7 +29,7 @@ namespace SingleRClient
         /// <param name="documentId">ID Document</param>
         /// <param name="userName">User name</param>
         /// <returns>Document object with document info</returns>
-        Task<Document> GetDocumentByIdAsync(int docId, string userName);
+        Task<Protocol.Common.Document> GetDocumentByIdAsync(int docId, string userName);
 
         /// <summary>
         /// Create document
@@ -115,11 +116,13 @@ namespace SingleRClient
 
         private HubConnection _connection;
 
+        private ConcurrentDictionary<Guid, object> _responsesActionDict = new ConcurrentDictionary<Guid, object>();
+
         private DataProvider()
         {
             _connection = new HubConnectionBuilder()
-                //.WithUrl("http://85.193.81.154:8088/document")
-                .WithUrl("http://localhost:32781/document")
+                .WithUrl("http://85.193.81.154:8088/document")
+                //.WithUrl("http://localhost:32787/document")
                 .WithAutomaticReconnect()
                 .Build();
             //_connection.ServerTimeout = TimeSpan.MaxValue;
@@ -182,17 +185,15 @@ namespace SingleRClient
         /// <returns>Documents headers list</returns>
         public Task<DocumentList> GetDocumentsListAsync(string userName)
         {
+            var newGuid = Guid.NewGuid();
             var tcs = new TaskCompletionSource<DocumentList>();
-            OnGetListDocuments = (documentsList, userName) =>
-            {
-                tcs.SetResult(documentsList);
-            };
+            _responsesActionDict[newGuid] = tcs;
 
             Task.Run(() =>
             {
                 try
                 {
-                    _connection.InvokeAsync("GetListDocuments", userName);
+                    _connection.InvokeAsync("GetListDocuments", userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -209,19 +210,17 @@ namespace SingleRClient
         /// <param name="documentId">ID Document</param>
         /// <param name="userName">User name</param>
         /// <returns>Document object with document info</returns>
-        public Task<Document> GetDocumentByIdAsync(int documentId, string userName)
+        public Task<Protocol.Common.Document> GetDocumentByIdAsync(int documentId, string userName)
         {
-            var tcs = new TaskCompletionSource<Document>();
-            OnGetDocumentById = (doc, userName) =>
-            {
-                tcs.SetResult(doc);
-            };
+            Guid newGuid = Guid.NewGuid();
+            var tcs = new TaskCompletionSource<Protocol.Common.Document>();
+            _responsesActionDict[newGuid] = tcs;
 
             Task.Run(() =>
             {
                 try
                 {
-                    _connection.InvokeAsync("GetDocumentById", documentId, userName);
+                    _connection.InvokeAsync("GetDocumentById", documentId, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -240,17 +239,15 @@ namespace SingleRClient
         /// <returns>(Document id, status info)</returns>
         public Task<(int, StatusResponse)> CreateDocumentAsync(string docName, string userName)
         {
+            Guid newGuid = Guid.NewGuid();
             var tcs = new TaskCompletionSource<(int, StatusResponse)>();
-            OnCreateDocument = (docId, userName, status) =>
-            {
-                tcs.SetResult((docId, status));
-            };
+            _responsesActionDict[newGuid] = tcs;
 
             Task.Run(() =>
             {
                 try
                 {
-                    _connection.InvokeAsync("CreateDocument", docName, userName);
+                    _connection.InvokeAsync("CreateDocument", docName, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -269,17 +266,15 @@ namespace SingleRClient
         /// <returns>Status info</returns>
         public Task<StatusResponse> DeleteDocumentByIdAsync(int docId, string userName)
         {
+            Guid newGuid = Guid.NewGuid();
             var tcs = new TaskCompletionSource<StatusResponse>();
-            OnDeleteDocumentById = (status, userName) =>
-            {
-                tcs.SetResult(status);
-            };
+            _responsesActionDict[newGuid] = tcs;
 
             Task.Run(() =>
             {
                 try
                 {
-                    _connection.InvokeAsync("DeleteDocumentById", docId, userName);
+                    _connection.InvokeAsync("DeleteDocumentById", docId, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -299,17 +294,15 @@ namespace SingleRClient
         /// <returns>(Shape ID, status info)</returns>
         public Task<(int?, StatusResponse)> CreateShapeAsync(Shape shape, string userName)
         {
+            var newGuid = Guid.NewGuid();
             var tcs = new TaskCompletionSource<(int?, StatusResponse)>();
-            OnCreateShape = (shape, status) =>
-            {
-                tcs.SetResult((shape?.Id, status));
-            };
+            _responsesActionDict[newGuid] = tcs;
 
             Task.Run(() =>
             {
                 try
                 {
-                    _connection.InvokeAsync("CreateShape", shape, userName);
+                    _connection.InvokeAsync("CreateShape", shape, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -329,17 +322,15 @@ namespace SingleRClient
         /// <returns>Status info</returns>
         public Task<StatusResponse> UpdateShapeAsync(Shape shape, string userName)
         {
+            Guid newGuid = Guid.NewGuid();
             var tcs = new TaskCompletionSource<StatusResponse>();
-            OnUpdateShape = (shape, status) =>
-            {
-                tcs.SetResult(status);
-            };
+            _responsesActionDict[newGuid] = tcs;
 
             Task.Run(() =>
             {
                 try
                 {
-                    _connection.InvokeAsync("UpdateShape", shape, userName);
+                    _connection.InvokeAsync("UpdateShape", shape, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -359,17 +350,15 @@ namespace SingleRClient
         /// <returns>Status info</returns>
         public Task<StatusResponse> DeleteShapeAsync(Shape shape, string userName)
         {
+            Guid newGuid = Guid.NewGuid();
             var tcs = new TaskCompletionSource<StatusResponse>();
-            OnDeleteShape = (shapeId, status) =>
-            {
-                tcs.SetResult(status);
-            };
+            _responsesActionDict[newGuid] = tcs;
 
             Task.Run(() =>
             {
                 try
                 {
-                    _connection.InvokeAsync("DeleteShape", shape, userName);
+                    _connection.InvokeAsync("DeleteShape", shape, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -427,10 +416,12 @@ namespace SingleRClient
 
         private void RegisterFunctions()
         {
-            _connection.On<DocumentList, string>("GetListDocuments", (list, userName) =>
+            _connection.On<DocumentList, string, Guid>("GetListDocuments", (list, userName, guid) =>
             {
                 try
                 {
+                    if (_responsesActionDict.TryRemove(guid, out object tcs))
+                        (tcs as TaskCompletionSource<DocumentList>)?.SetResult(list);
 
                     OnGetListDocuments?.Invoke(list, userName);
                 }
@@ -440,10 +431,13 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<Document, string>("GetDocumentById", (doc, userName) =>
+            _connection.On<Protocol.Common.Document, string, Guid>("GetDocumentById", (doc, userName, guid) =>
             {
                 try
                 {
+                    if (_responsesActionDict.TryRemove(guid, out object tcs))
+                        (tcs as TaskCompletionSource<Protocol.Common.Document>)?.SetResult(doc);
+
                     OnGetDocumentById?.Invoke(doc, userName);
                 }
                 catch (Exception ex)
@@ -452,11 +446,14 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<Document, StatusResponse>("CreateDocument", (document, status) =>
+            _connection.On<Protocol.Common.Document, StatusResponse, Guid>("CreateDocument", (document, status, guid) =>
             {
                 try
                 {
-                    OnCreateDocument?.Invoke(document.Header.Id, document.Header.UserName, status);
+                    if (_responsesActionDict.TryRemove(guid, out object tcs))
+                        (tcs as TaskCompletionSource<(int, StatusResponse)>)?.SetResult((document?.Header.Id ?? 0, status));
+
+                    OnCreateDocument?.Invoke(document?.Header.Id ?? 0, document.Header.UserName, status);
                 }
                 catch (Exception ex)
                 {
@@ -464,10 +461,13 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<StatusResponse, string>("DeleteDocumentById", (status, userName) =>
+            _connection.On<StatusResponse, string, Guid>("DeleteDocumentById", (status, userName, guid) =>
             {
                 try
                 {
+                    if (_responsesActionDict.TryRemove(guid, out object tcs))
+                        (tcs as TaskCompletionSource<StatusResponse>)?.SetResult(status);
+
                     OnDeleteDocumentById?.Invoke(status, userName);
                 }
                 catch (Exception ex)
@@ -476,10 +476,13 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<Shape, StatusResponse>("CreateShape", (shape, status) =>
+            _connection.On<Shape, StatusResponse, Guid>("CreateShape", (shape, status, guid) =>
             {
                 try
                 {
+                    if (_responsesActionDict.TryRemove(guid, out object tcs))
+                        (tcs as TaskCompletionSource<(int?, StatusResponse)>)?.SetResult((shape?.Id, status));
+
                     OnCreateShape?.Invoke(shape, status);
                 }
                 catch (Exception ex)
@@ -488,10 +491,13 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<Shape, StatusResponse>("UpdateShape", (shape, status) =>
+            _connection.On<Shape, StatusResponse, Guid>("UpdateShape", (shape, status, guid) =>
             {
                 try
                 {
+                    if (_responsesActionDict.TryRemove(guid, out object tcs))
+                        (tcs as TaskCompletionSource<StatusResponse>)?.SetResult(status);
+
                     OnUpdateShape?.Invoke(shape, status);
                 }
                 catch
@@ -500,10 +506,13 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<Shape, StatusResponse>("DeleteShape", (shape, status) =>
+            _connection.On<Shape, StatusResponse, Guid>("DeleteShape", (shape, status, guid) =>
             {
                 try
                 {
+                    if (_responsesActionDict.TryRemove(guid, out object tcs))
+                        (tcs as TaskCompletionSource<StatusResponse>)?.SetResult(status);
+
                     OnDeleteShape?.Invoke(shape, status);
                 }
                 catch
@@ -517,7 +526,7 @@ namespace SingleRClient
         public delegate void Reconnected(string connectionId);
         public delegate void Closed(string error);
         public delegate void GetListDocuments(DocumentList documentsList, string userName);
-        public delegate void GetDocumentById(Document doc, string userName);
+        public delegate void GetDocumentById(Protocol.Common.Document doc, string userName);
         public delegate void CreateDocument(int docId, string userName, StatusResponse status);
         public delegate void DeleteDocumentById(StatusResponse status, string userName);
         public delegate void CreateShape(Shape shape, StatusResponse status);

@@ -37,6 +37,8 @@ namespace SignalR_Service.Models
             var baseResponse = BaseResponse.ReadResponse(response);
             var shape = baseResponse as Shape;
             var status = baseResponse as StatusResponse;
+            if (shape != null && status == null)
+                status = new StatusResponse() { Status = Status.Success };
             return (shape, status);
         }
 
@@ -97,9 +99,8 @@ namespace SignalR_Service.Models
             requestUpdateShape.Id = shapeInfo.Id;
             var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestUpdateShape));
             var baseResponse = BaseResponse.ReadResponse(response);
-            var shape = baseResponse as Shape;
             var status = baseResponse as StatusResponse;
-            return (shape, status);
+            return (shapeInfo, status);
         }
     }
 }

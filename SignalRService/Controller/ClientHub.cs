@@ -14,10 +14,10 @@ namespace SignalR_Service.Controller
         /// <param name="idDocument">ID Document</param>
         /// <returns>Document</returns>
         [HttpGet]
-        public async Task GetDocumentById(int idDocument, string userName)
+        public async Task GetDocumentById(int idDocument, string userName, Guid guid)
         {
             var res = await _serializer.GetDocumentById(idDocument, userName);
-            await Clients.Caller.SendAsync("GetDocumentById", res, userName);
+            await Clients.Caller.SendAsync("GetDocumentById", res, userName, guid);
         }
 
         /// <summary>
@@ -25,10 +25,10 @@ namespace SignalR_Service.Controller
         /// </summary>
         /// <returns>List documents</returns>
         [HttpGet]
-        public async Task GetListDocuments(string userName)
+        public async Task GetListDocuments(string userName, Guid guid)
         {
             var res = await _serializer.GetListDocuments(userName);
-            await Clients.Caller.SendAsync("GetListDocuments", res, userName);
+            await Clients.Caller.SendAsync("GetListDocuments", res, userName, guid);
         }
 
         /// <summary>
@@ -37,10 +37,10 @@ namespace SignalR_Service.Controller
         /// <param name="name">Name document</param>
         /// <returns>Successful create document</returns>
         [HttpPost]
-        public async Task CreateDocument(string name, string userName)
+        public async Task CreateDocument(string name, string userName, Guid guid)
         {
             var res = await _serializer.CreateDocument(name, userName);
-            await Clients.All.SendAsync("CreateDocument", res, userName);
+            await Clients.All.SendAsync("CreateDocument", res, userName, guid);
         }
 
         /// <summary>
@@ -50,10 +50,10 @@ namespace SignalR_Service.Controller
         /// <param name="userName">Username</param>
         /// <returns>Successful delete document</returns>
         [HttpDelete]
-        public async Task DeleteDocumentById(int idDocument, string userName)
+        public async Task DeleteDocumentById(int idDocument, string userName, Guid guid)
         {
             var res = await _serializer.DeleteDocumentById(idDocument, userName);
-            await Clients.All.SendAsync("DeleteDocumentById", res, userName);
+            await Clients.All.SendAsync("DeleteDocumentById", res, userName, guid);
         }
 
         /// <summary>
@@ -64,10 +64,10 @@ namespace SignalR_Service.Controller
         /// <param name="userName">Username</param>
         /// <returns>All info about operation</returns>
         [HttpPost]
-        public async Task CreateShape(Shape shapeInfo, string userName)
+        public async Task CreateShape(Shape shapeInfo, string userName, Guid guid)
         {
             var res = await _serializer.CreateShape(shapeInfo.DocumentId, shapeInfo, userName);
-            await Clients.All.SendAsync("CreateShape", res.Item1, res.Item2);
+            await Clients.All.SendAsync("CreateShape", res.Item1, res.Item2, guid);
         }
 
         /// <summary>
@@ -78,10 +78,10 @@ namespace SignalR_Service.Controller
         /// <param name="userName">Username</param>
         /// <returns>All info about operation</returns>
         [HttpPut]
-        public async Task UpdateShape(Shape shape, string userName)
+        public async Task UpdateShape(Shape shape, string userName, Guid guid)
         {
             var res = await _serializer.UpdateShape(shape.DocumentId, shape, userName);
-            await Clients.All.SendAsync("UpdateShape ", res.Item1, res.Item2);
+            await Clients.All.SendAsync("UpdateShape ", res.Item1, res.Item2, guid);
         }
 
         /// <summary>
@@ -92,10 +92,10 @@ namespace SignalR_Service.Controller
         /// <param name="userName">Username</param>
         /// <returns>All info about operation</returns>
         [HttpDelete]
-        public async Task DeleteShape(Shape shape, string userName)
+        public async Task DeleteShape(Shape shape, string userName, Guid guid)
         {
             var res = await _serializer.DeleteShape(shape, userName);
-            await Clients.All.SendAsync("DeleteShape", res.Item1, res.Item2);
+            await Clients.All.SendAsync("DeleteShape", res.Item1, res.Item2, guid);
         }
     }
 }
