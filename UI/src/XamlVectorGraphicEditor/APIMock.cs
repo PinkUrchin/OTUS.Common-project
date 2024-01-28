@@ -415,7 +415,10 @@ namespace XamlVectorGraphicEditor
                 document.Header.UpdateAuthor = userName;
                 document.Header.UpdateDate = shape.UpdateDate;
 
-                OnCreateShape?.Invoke(shape, new StatusResponse { Status = Status.Success });
+                Task.Run(() =>
+                {
+                    OnCreateShape?.Invoke(shape, new StatusResponse { Status = Status.Success });
+                });
             }
         }
 
@@ -438,7 +441,10 @@ namespace XamlVectorGraphicEditor
             document.Header.UpdateAuthor = shape.UpdateAuthor;
             document.Header.UpdateDate = shape.UpdateDate;
 
-            OnUpdateShape?.Invoke(shape, new StatusResponse { Status = Status.Success });
+            Task.Run(() =>
+            {
+                OnUpdateShape?.Invoke(shape, new StatusResponse { Status = Status.Success });
+            });
         }
 
         public void TestDeleteShape(int docId)
@@ -454,8 +460,10 @@ namespace XamlVectorGraphicEditor
             var userName = RandomUser();
             document.Header.UpdateAuthor = shape.UpdateAuthor;
             document.Header.UpdateDate = shape.UpdateDate;
-
-            OnDeleteShape?.Invoke(shape, new StatusResponse { Status = Status.Success });
+            Task.Run(() =>
+            {
+                OnDeleteShape?.Invoke(shape, new StatusResponse { Status = Status.Success });
+            });
         }
 
         #endregion

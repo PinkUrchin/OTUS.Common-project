@@ -273,11 +273,14 @@ public partial class MainWindow : Window
 
     private void RemoveShape(int id)
     {
-        for (int i = MainCanvas.Children.Count - 1; i >= 0; i--) 
+        Application.Current.Dispatcher.BeginInvoke(() =>
         {
-            if (MainCanvas.Children[i] is AbstractShape shape && shape.Id == id)
-                MainCanvas.Children.RemoveAt(i);
-        }
+            for (int i = MainCanvas.Children.Count - 1; i >= 0; i--)
+            {
+                if (MainCanvas.Children[i] is AbstractShape shape && shape.Id == id)
+                    MainCanvas.Children.RemoveAt(i);
+            }
+        });
     }
 
     private async Task UpdateProtocolShape(AbstractShape shape)
@@ -431,11 +434,14 @@ public partial class MainWindow : Window
 
     private void AddUIShape(Protocol.Common.Shape shape)
     {
-        var uiShape = ShapeFactory.CreateShape(shape);
-        if (uiShape is AbstractShape aShape)
-            aShape.Changed = ShapeChanged;
+        Application.Current.Dispatcher.BeginInvoke(() =>
+        {
+            var uiShape = ShapeFactory.CreateShape(shape);
+            if (uiShape is AbstractShape aShape)
+                aShape.Changed = ShapeChanged;
 
-        MainCanvas.Children.Add(uiShape);
+            MainCanvas.Children.Add(uiShape);
+        });
     }
 
     private async Task LoadDocument(int id, string docName)
