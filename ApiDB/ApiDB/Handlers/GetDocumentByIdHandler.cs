@@ -41,7 +41,7 @@ namespace apidb
                         CreateDate = x.CreateDate,
                         UpdateDate = x.UpdateDate,
                         CreateAuthor = x.CreateAuthor,                        
-                        DocumentId = x.Id,
+                        DocumentId = x.DocumentId,
                         Coords = x.Coords
                     }).ToList()
                 };
