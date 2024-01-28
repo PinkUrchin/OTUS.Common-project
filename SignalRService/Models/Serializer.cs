@@ -60,9 +60,8 @@ namespace SignalR_Service.Models
             requestDeleteShape.Id = shape.Id;
             var response = await RpcHelper.DoRPCRequestAsync(JsonConvert.SerializeObject(requestDeleteShape));
             var baseResponse = BaseResponse.ReadResponse(response);
-            var shapeRes = baseResponse as Shape;
             var status = baseResponse as StatusResponse;
-            return (shapeRes, status);
+            return (shape, status);
         }
 
         public async Task<Document> GetDocumentById(int idDocument, string userName)
