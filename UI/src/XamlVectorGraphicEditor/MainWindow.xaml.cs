@@ -371,7 +371,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            await LoadDocument(dlg.SelectedDoc.Id, dlg.NewDocName);
+            await LoadDocument(dlg.SelectedDoc.Id, dlg.SelectedDoc.Title);
         }
     }
 
