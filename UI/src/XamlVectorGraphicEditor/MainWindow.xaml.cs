@@ -229,7 +229,7 @@ public partial class MainWindow : Window
         MainCanvas.ContextMenu.AddPaletteHeader(new PanelBackgroundChanger(MainCanvas));
 
         btnSelectDocument.IsEnabled = false;
-        btnSelectDocument.Content = "Подключение...";
+        Title = "Подключение к серверу...";
 
 #if !MOCK
         btnTestAddShape.Visibility = Visibility.Hidden;
@@ -363,14 +363,15 @@ public partial class MainWindow : Window
     {
         if (dlg.IsNewDoc)
         {
+            Title = $"Создание документа [{dlg.NewDocName}]...";
             var result = await Context.DataProvider().CreateDocumentAsync(dlg.NewDocName, Context.UserName);
 
             if (result.Item2.Status == Status.Success)
-                await LoadDocument(result.Item1);
+                await LoadDocument(result.Item1, dlg.NewDocName);
         }
         else
         {
-            await LoadDocument(dlg.SelectedDoc.Id);
+            await LoadDocument(dlg.SelectedDoc.Id, dlg.NewDocName);
         }
     }
 
@@ -407,6 +408,7 @@ public partial class MainWindow : Window
 
         btnSelectDocument.IsEnabled = true;
         btnSelectDocument.Content = "Выбор документа";
+        Title = "Подключено";
 
         provider.OnCreateShape += ProtocolCreateShape;
         provider.OnUpdateShape += ProtocolUpdateShape;
@@ -436,8 +438,9 @@ public partial class MainWindow : Window
         MainCanvas.Children.Add(uiShape);
     }
 
-    private async Task LoadDocument(int id)
+    private async Task LoadDocument(int id, string docName)
     {
+        Title = $"Загрузка документа [{docName}]...";
         var doc = await Context.DataProvider().GetDocumentByIdAsync(id, Context.UserName);
         Context.Document = doc;
 

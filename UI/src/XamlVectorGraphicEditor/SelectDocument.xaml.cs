@@ -37,10 +37,12 @@ namespace XamlVectorGraphicEditor
 
         public async void InitDocs()
         {
+            Title = "Получение списка документов...";
             var items = await Context.DataProvider().GetDocumentsListAsync(Context.UserName);
             foreach (var item in items.Documents) {
                 _docs.Add(item);
             }
+            Title = "Выбор документа";
 
             lbDocs.ItemsSource = _docs;
         }
