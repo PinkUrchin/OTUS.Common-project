@@ -76,7 +76,11 @@ abstract partial class AbstractShape : Border, ICloneable
         }
 
         if (canDelete)
-            (VisualParent as Canvas).Children.Remove(this);
+        {
+            var canvas = VisualParent as Canvas;
+            if (canvas != null)
+                RemoveFromCanvas(canvas);
+        }
     }
 
     private void Rotate(in int angle)
