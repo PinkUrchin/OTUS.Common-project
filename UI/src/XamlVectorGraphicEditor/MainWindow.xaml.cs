@@ -234,6 +234,7 @@ public partial class MainWindow : Window
         btnTestAddShape.Visibility = Visibility.Hidden;
         btnTestRemoveShape.Visibility = Visibility.Hidden;
         btnTestUpdateShape.Visibility = Visibility.Hidden;
+        btnTestError.Visibility = Visibility.Hidden;
 #endif
     }
 
@@ -291,6 +292,7 @@ public partial class MainWindow : Window
         if (protocolShape == null)
             return;
 
+        shape.UserName = Context.UserName;
         protocolShape.Coords = JsonConvert.SerializeObject(shape.CreateDTO());
         protocolShape.UpdateDate = DateTime.Now;
         protocolShape.UpdateAuthor = Context.UserName;
@@ -304,6 +306,7 @@ public partial class MainWindow : Window
 
     private async Task<bool> AddShape(AbstractShape shape)
     {
+        shape.UserName = Context.UserName;
         var protocolShape = shape.CreateProtocolShape();
         var result = await Context.DataProvider().CreateShapeAsync(protocolShape, Context.UserName);
         if (result.Item2.Status == Status.Success)
@@ -325,7 +328,7 @@ public partial class MainWindow : Window
         var shape = new MyRectangle(LastContextMenuPoint);
         if (await AddShape(shape)) 
         {
-            MainCanvas.Children.Add(shape);
+            shape.AddToCanvas(MainCanvas);
         }
     }
     
@@ -336,7 +339,7 @@ public partial class MainWindow : Window
         var shape = new MyTriangle(LastContextMenuPoint);
         if (await AddShape(shape))
         {
-            MainCanvas.Children.Add(shape);
+            shape.AddToCanvas(MainCanvas);
         }
     }
 
@@ -345,7 +348,7 @@ public partial class MainWindow : Window
         var shape = new MyEllipse(LastContextMenuPoint);
         if (await AddShape(shape))
         {
-            MainCanvas.Children.Add(shape);
+            shape.AddToCanvas(MainCanvas);
         }
     }
 
@@ -418,6 +421,7 @@ public partial class MainWindow : Window
         provider.OnCreateShape += ProtocolCreateShape;
         provider.OnUpdateShape += ProtocolUpdateShape;
         provider.OnDeleteShape += ProtocolDeleteShape;
+        provider.OnError += ProtocolError;
 
 
         //
@@ -432,6 +436,14 @@ public partial class MainWindow : Window
         {
             Close();
         }
+    }
+
+    private void ProtocolError(Exception e)
+    {
+        Application.Current.Dispatcher.BeginInvoke(() =>
+        {
+            MessageBox.Show(this, e.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        });
     }
 
     private void AddUIShape(Protocol.Common.Shape shape)
@@ -482,6 +494,14 @@ public partial class MainWindow : Window
         if (Context.DataProvider() is ITestDataProvider tp)
         {
             tp.TestDeleteShape(Context.Document.Header.Id);
+        }
+    }
+
+    private void btnTestError_Click(object sender, RoutedEventArgs e)
+    {
+        if (Context.DataProvider() is ITestDataProvider tp)
+        {
+            tp.TestError();
         }
     }
 

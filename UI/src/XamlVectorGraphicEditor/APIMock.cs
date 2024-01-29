@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Protocol.Common;
 using SingleRClient;
-using static SingleRClient.DataProvider;
 using Newtonsoft.Json;
 using XamlVectorGraphicEditor.MyShapes;
+using static SingleRClient.DataProvider;
+using Protocol.Common;
 
 namespace XamlVectorGraphicEditor
 {
@@ -17,6 +17,7 @@ namespace XamlVectorGraphicEditor
         void TestAddShape(int docId);
         void TestUpdateShape(int docId);
         void TestDeleteShape(int docId);
+        void TestError();
     }
 
     internal class APIMock : IDataProvider, ITestDataProvider
@@ -394,6 +395,7 @@ namespace XamlVectorGraphicEditor
         /// Notify users the connection lost;
         /// </summary>
         public event Closed OnClosed;
+        public event Error OnError;
 
         private string RandomUser()
         {
@@ -463,6 +465,14 @@ namespace XamlVectorGraphicEditor
             Task.Run(() =>
             {
                 OnDeleteShape?.Invoke(shape, new StatusResponse { Status = Status.Success });
+            });
+        }
+
+        public void TestError()
+        {
+            Task.Run(() =>
+            {
+                OnError?.Invoke(new Exception("Mock exception"));
             });
         }
 

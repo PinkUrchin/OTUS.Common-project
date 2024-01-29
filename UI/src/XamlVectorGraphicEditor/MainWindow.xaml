@@ -38,5 +38,6 @@
         <Button Name="btnTestAddShape" Content="Test_Add" HorizontalAlignment="Left" Height="25" Margin="130,10,0,0" VerticalAlignment="Top" Width="65" Click="btnTestAddShape_Click"/>
         <Button Name="btnTestUpdateShape" Content="Test_Update" HorizontalAlignment="Left" Height="25" Margin="200,10,0,0" VerticalAlignment="Top" Width="65" Click="btnTestUpdateShape_Click"/>
         <Button Name="btnTestRemoveShape" Content="Test_Del" HorizontalAlignment="Left" Height="25" Margin="270,10,0,0" VerticalAlignment="Top" Width="65" Click="btnTestRemoveShape_Click"/>
+        <Button Name="btnTestError" Content="Test_Error" HorizontalAlignment="Left" Height="25" Margin="340,10,0,0" VerticalAlignment="Top" Width="65" Click="btnTestError_Click"/>
     </Grid>
 </Window>

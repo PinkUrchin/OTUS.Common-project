@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using static SingleRClient.DataProvider;
 using System.Security.Cryptography;
 using System.Collections.Concurrent;
+using System.Security.AccessControl;
+using System.Reflection.Metadata;
 
 namespace SingleRClient
 {
@@ -108,6 +110,10 @@ namespace SingleRClient
         /// Notify users the connection lost;
         /// </summary>
         event Closed OnClosed;
+        /// <summary>
+        /// Notify users then error
+        /// </summary>
+        event Error OnError;
     }
     
     public class DataProvider : IDataProvider, IDisposable
@@ -116,7 +122,45 @@ namespace SingleRClient
 
         private HubConnection _connection;
 
-        private ConcurrentDictionary<Guid, object> _responsesActionDict = new ConcurrentDictionary<Guid, object>();
+        private readonly object _responsesLock = new object();
+        private readonly Dictionary<Guid, object> _responsesActionDict = new Dictionary<Guid, object>();
+
+        private bool ProcessOwnResponse<T>(Guid responseId, Action<T> action)
+        {
+            object response = null;
+            bool isOwn = false;
+            lock (_responsesLock)
+            {
+                if (_responsesActionDict.TryGetValue(responseId, out response))
+                {
+                    isOwn = true;
+                    _responsesActionDict.Remove(responseId);
+                }
+
+            }
+            
+            if (isOwn)
+            {
+                if (response is T t)
+                    action(t);
+                else
+                    throw new InvalidCastException($"Invalid response type: {nameof(T)}");
+            }
+
+            return isOwn;
+                
+        }
+
+        private Guid AddRequest(object response) 
+        {
+            var id = Guid.NewGuid();
+            lock (_responsesLock)
+            {
+                _responsesActionDict[id] = response;
+            }
+
+            return id;
+        }
 
         private DataProvider()
         {
@@ -164,10 +208,6 @@ namespace SingleRClient
         /// </summary>
         public event Closed OnClosed;
 
-        private event GetListDocuments OnGetListDocuments;
-
-        private event GetDocumentById OnGetDocumentById;
-
         public event CreateDocument OnCreateDocument;
 
         public event DeleteDocumentById OnDeleteDocumentById;
@@ -178,6 +218,13 @@ namespace SingleRClient
 
         public event DeleteShape OnDeleteShape;
 
+        public event Error OnError;
+
+        private void ProcessError(Exception e)
+        {
+            OnError?.Invoke(e);
+        }
+
         /// <summary>
         /// Get list documents
         /// </summary>
@@ -185,9 +232,8 @@ namespace SingleRClient
         /// <returns>Documents headers list</returns>
         public Task<DocumentList> GetDocumentsListAsync(string userName)
         {
-            var newGuid = Guid.NewGuid();
             var tcs = new TaskCompletionSource<DocumentList>();
-            _responsesActionDict[newGuid] = tcs;
+            var newGuid = AddRequest(tcs);
 
             Task.Run(() =>
             {
@@ -197,7 +243,7 @@ namespace SingleRClient
                 }
                 catch (Exception ex)
                 {
-                    // TODO: exception handling. Logging
+                    ProcessError(ex);
                 }
             });
 
@@ -211,10 +257,9 @@ namespace SingleRClient
         /// <param name="userName">User name</param>
         /// <returns>Document object with document info</returns>
         public Task<Protocol.Common.Document> GetDocumentByIdAsync(int documentId, string userName)
-        {
-            Guid newGuid = Guid.NewGuid();
+        { 
             var tcs = new TaskCompletionSource<Protocol.Common.Document>();
-            _responsesActionDict[newGuid] = tcs;
+            var newGuid = AddRequest(tcs);
 
             Task.Run(() =>
             {
@@ -224,7 +269,7 @@ namespace SingleRClient
                 }
                 catch (Exception ex)
                 {
-                    // TODO: exception handling. Logging
+                    ProcessError(ex);
                 }
             });
 
@@ -239,9 +284,8 @@ namespace SingleRClient
         /// <returns>(Document id, status info)</returns>
         public Task<(int, StatusResponse)> CreateDocumentAsync(string docName, string userName)
         {
-            Guid newGuid = Guid.NewGuid();
             var tcs = new TaskCompletionSource<(int, StatusResponse)>();
-            _responsesActionDict[newGuid] = tcs;
+            var newGuid = AddRequest(tcs);
 
             Task.Run(() =>
             {
@@ -251,7 +295,7 @@ namespace SingleRClient
                 }
                 catch (Exception ex)
                 {
-                    // TODO: exception handling. Logging
+                    ProcessError(ex);
                 }
             });
 
@@ -266,9 +310,8 @@ namespace SingleRClient
         /// <returns>Status info</returns>
         public Task<StatusResponse> DeleteDocumentByIdAsync(int docId, string userName)
         {
-            Guid newGuid = Guid.NewGuid();
             var tcs = new TaskCompletionSource<StatusResponse>();
-            _responsesActionDict[newGuid] = tcs;
+            var newGuid = AddRequest(tcs);
 
             Task.Run(() =>
             {
@@ -278,7 +321,7 @@ namespace SingleRClient
                 }
                 catch (Exception ex)
                 {
-                    // TODO: exception handling. Logging
+                    ProcessError(ex);
                 }
             });
 
@@ -294,10 +337,9 @@ namespace SingleRClient
         /// <returns>(Shape ID, status info)</returns>
         public Task<(int?, StatusResponse)> CreateShapeAsync(Shape shape, string userName)
         {
-            var newGuid = Guid.NewGuid();
             var tcs = new TaskCompletionSource<(int?, StatusResponse)>();
-            _responsesActionDict[newGuid] = tcs;
-
+            var newGuid = AddRequest(tcs);
+            
             Task.Run(() =>
             {
                 try
@@ -306,7 +348,7 @@ namespace SingleRClient
                 }
                 catch (Exception ex)
                 {
-                    // TODO: exception handling. Logging
+                    ProcessError(ex);
                 }
             });
 
@@ -322,9 +364,8 @@ namespace SingleRClient
         /// <returns>Status info</returns>
         public Task<StatusResponse> UpdateShapeAsync(Shape shape, string userName)
         {
-            Guid newGuid = Guid.NewGuid();
             var tcs = new TaskCompletionSource<StatusResponse>();
-            _responsesActionDict[newGuid] = tcs;
+            var newGuid = AddRequest(tcs);
 
             Task.Run(() =>
             {
@@ -334,7 +375,7 @@ namespace SingleRClient
                 }
                 catch (Exception ex)
                 {
-                    // TODO: exception handling. Logging
+                    ProcessError(ex);
                 }
             });
 
@@ -350,9 +391,8 @@ namespace SingleRClient
         /// <returns>Status info</returns>
         public Task<StatusResponse> DeleteShapeAsync(Shape shape, string userName)
         {
-            Guid newGuid = Guid.NewGuid();
             var tcs = new TaskCompletionSource<StatusResponse>();
-            _responsesActionDict[newGuid] = tcs;
+            var newGuid = AddRequest(tcs);
 
             Task.Run(() =>
             {
@@ -362,7 +402,7 @@ namespace SingleRClient
                 }
                 catch (Exception ex)
                 {
-                    // TODO: exception handling. Logging
+                    ProcessError(ex);
                 }
             });
 
@@ -395,6 +435,7 @@ namespace SingleRClient
 
         private async Task<bool> ConnectionWithRetryAsync(CancellationToken token)
         {
+            int retryCount = 5;
             while (true)
             {
                 try
@@ -410,6 +451,13 @@ namespace SingleRClient
                 {
                     // Failed to connect, trying again in 5000 ms.
                     await Task.Delay(5000);
+                    retryCount--;
+
+                    if (retryCount == 0)
+                    {
+                        ProcessError(ex);
+                        return false;
+                    }
                 }
             }
         }
@@ -420,14 +468,14 @@ namespace SingleRClient
             {
                 try
                 {
-                    if (_responsesActionDict.TryRemove(guid, out object tcs))
-                        (tcs as TaskCompletionSource<DocumentList>)?.SetResult(list);
-
-                    OnGetListDocuments?.Invoke(list, userName);
+                    ProcessOwnResponse<TaskCompletionSource<DocumentList>>(guid, (tcs) =>
+                    {
+                        tcs.SetResult(list);
+                    });
                 }
                 catch (Exception ex)
                 {
-                    //TODO logger
+                    ProcessError(ex);
                 }
             });
 
@@ -435,14 +483,14 @@ namespace SingleRClient
             {
                 try
                 {
-                    if (_responsesActionDict.TryRemove(guid, out object tcs))
-                        (tcs as TaskCompletionSource<Protocol.Common.Document>)?.SetResult(doc);
-
-                    OnGetDocumentById?.Invoke(doc, userName);
+                    ProcessOwnResponse<TaskCompletionSource<Protocol.Common.Document>>(guid, (tcs) =>
+                    {
+                        tcs.SetResult(doc);
+                    });
                 }
                 catch (Exception ex)
                 {
-                    //TODO logger
+                    ProcessError(ex);
                 }
             });
 
@@ -450,14 +498,17 @@ namespace SingleRClient
             {
                 try
                 {
-                    if (_responsesActionDict.TryRemove(guid, out object tcs))
-                        (tcs as TaskCompletionSource<(int, StatusResponse)>)?.SetResult((document?.Header.Id ?? 0, status));
-
-                    OnCreateDocument?.Invoke(document?.Header.Id ?? 0, document.Header.UserName, status);
+                    if (!ProcessOwnResponse<TaskCompletionSource<(int, StatusResponse)>>(guid, (tcs) =>
+                    {
+                        tcs.SetResult((document?.Header.Id ?? 0, status));   
+                    }))
+                    {
+                        OnCreateDocument?.Invoke(document?.Header.Id ?? 0, document?.Header.UserName ?? "", status);
+                    };
                 }
                 catch (Exception ex)
                 {
-                    //TODO logger
+                    ProcessError(ex);
                 }
             });
 
@@ -465,14 +516,17 @@ namespace SingleRClient
             {
                 try
                 {
-                    if (_responsesActionDict.TryRemove(guid, out object tcs))
-                        (tcs as TaskCompletionSource<StatusResponse>)?.SetResult(status);
-
-                    OnDeleteDocumentById?.Invoke(status, userName);
+                    if (!ProcessOwnResponse<TaskCompletionSource<StatusResponse>>(guid, (tcs) =>
+                    {
+                        tcs.SetResult(status);
+                    }))
+                    {
+                        OnDeleteDocumentById?.Invoke(status, userName);
+                    };
                 }
                 catch (Exception ex)
                 {
-                    //TODO logger
+                    ProcessError(ex);
                 }
             });
 
@@ -480,14 +534,17 @@ namespace SingleRClient
             {
                 try
                 {
-                    if (_responsesActionDict.TryRemove(guid, out object tcs))
-                        (tcs as TaskCompletionSource<(int?, StatusResponse)>)?.SetResult((shape?.Id, status));
-
-                    OnCreateShape?.Invoke(shape, status);
+                    if (!ProcessOwnResponse<TaskCompletionSource<(int?, StatusResponse)>>(guid, (tcs) =>
+                    {
+                        tcs.SetResult((shape?.Id, status));
+                    }))
+                    {
+                        OnCreateShape?.Invoke(shape, status);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    //TODO logger
+                    ProcessError(ex);
                 }
             });
 
@@ -495,14 +552,17 @@ namespace SingleRClient
             {
                 try
                 {
-                    if (_responsesActionDict.TryRemove(guid, out object tcs))
-                        (tcs as TaskCompletionSource<StatusResponse>)?.SetResult(status);
-
-                    OnUpdateShape?.Invoke(shape, status);
+                    if (!ProcessOwnResponse<TaskCompletionSource<StatusResponse>>(guid, (tcs) =>
+                    {
+                        tcs.SetResult(status);
+                    }))
+                    {
+                        OnUpdateShape?.Invoke(shape, status);
+                    }
                 }
-                catch
+                catch (Exception ex) 
                 {
-                    //TODO logger
+                    ProcessError(ex);
                 }
             });
 
@@ -510,14 +570,17 @@ namespace SingleRClient
             {
                 try
                 {
-                    if (_responsesActionDict.TryRemove(guid, out object tcs))
-                        (tcs as TaskCompletionSource<StatusResponse>)?.SetResult(status);
-
-                    OnDeleteShape?.Invoke(shape, status);
+                    if (!ProcessOwnResponse<TaskCompletionSource<StatusResponse>>(guid, (tcs) =>
+                    {
+                        tcs.SetResult(status);                            
+                    }))
+                    {
+                        OnDeleteShape?.Invoke(shape, status);
+                    }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    //TODO logger
+                    ProcessError(ex);
                 }
             });
         }
@@ -532,5 +595,6 @@ namespace SingleRClient
         public delegate void CreateShape(Shape shape, StatusResponse status);
         public delegate void UpdateShape(Shape shape, StatusResponse status);
         public delegate void DeleteShape(Shape shape, StatusResponse status);
+        public delegate void Error(Exception e);
     }
 }
