@@ -40,9 +40,11 @@ namespace apidb
                         ShapeType = (byte)x.ShapeType,
                         CreateDate = x.CreateDate,
                         UpdateDate = x.UpdateDate,
+                        UpdateAuthor = x.UpdateAuthor,
                         CreateAuthor = x.CreateAuthor,                        
                         DocumentId = x.DocumentId,
                         Coords = x.Coords
+
                     }).ToList()
                 };
 
