@@ -17,7 +17,7 @@ namespace SignalR_Service.Controller
         public async Task GetDocumentById(int idDocument, string userName, Guid guid)
         {
             var res = await _serializer.GetDocumentById(idDocument, userName);
-            await Clients.Caller.SendAsync("GetDocumentById", res, userName, guid);
+            await Clients.Caller.SendAsync(SignalRMethod.GetDocumentById, res, userName, guid);
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace SignalR_Service.Controller
         public async Task GetListDocuments(string userName, Guid guid)
         {
             var res = await _serializer.GetListDocuments(userName);
-            await Clients.Caller.SendAsync("GetListDocuments", res, userName, guid);
+            await Clients.Caller.SendAsync(SignalRMethod.GetListDocuments, res, userName, guid);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace SignalR_Service.Controller
         public async Task CreateDocument(string name, string userName, Guid guid)
         {
             var res = await _serializer.CreateDocument(name, userName);
-            await Clients.All.SendAsync("CreateDocument", res.Item1, res.Item2, guid);
+            await Clients.All.SendAsync(SignalRMethod.CreateDocument, res.Item1, res.Item2, guid);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace SignalR_Service.Controller
         public async Task DeleteDocumentById(int idDocument, string userName, Guid guid)
         {
             var res = await _serializer.DeleteDocumentById(idDocument, userName);
-            await Clients.All.SendAsync("DeleteDocumentById", res, userName, guid);
+            await Clients.All.SendAsync(SignalRMethod.DeleteDocumentById, res, userName, guid);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace SignalR_Service.Controller
         public async Task CreateShape(Shape shapeInfo, string userName, Guid guid)
         {
             var res = await _serializer.CreateShape(shapeInfo.DocumentId, shapeInfo, userName);
-            await Clients.All.SendAsync("CreateShape", res.Item1, res.Item2, guid);
+            await Clients.All.SendAsync( SignalRMethod.CreateShape, res.Item1, res.Item2, guid);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace SignalR_Service.Controller
         public async Task UpdateShape(Shape shape, string userName, Guid guid)
         {
             var res = await _serializer.UpdateShape(shape.DocumentId, shape, userName);
-            await Clients.All.SendAsync("UpdateShape", res.Item1, res.Item2, guid);
+            await Clients.All.SendAsync( SignalRMethod.UpdateShape, res.Item1, res.Item2, guid);
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace SignalR_Service.Controller
         public async Task DeleteShape(Shape shape, string userName, Guid guid)
         {
             var res = await _serializer.DeleteShape(shape, userName);
-            await Clients.All.SendAsync("DeleteShape", res.Item1, res.Item2, guid);
+            await Clients.All.SendAsync( SignalRMethod.DeleteShape, res.Item1, res.Item2, guid);
         }
     }
 }

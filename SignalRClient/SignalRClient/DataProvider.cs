@@ -239,7 +239,7 @@ namespace SingleRClient
             {
                 try
                 {
-                    _connection.InvokeAsync("GetListDocuments", userName, newGuid);
+                    _connection.InvokeAsync(SignalRMethod.GetListDocuments, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -265,7 +265,7 @@ namespace SingleRClient
             {
                 try
                 {
-                    _connection.InvokeAsync("GetDocumentById", documentId, userName, newGuid);
+                    _connection.InvokeAsync(SignalRMethod.GetDocumentById, documentId, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -291,7 +291,7 @@ namespace SingleRClient
             {
                 try
                 {
-                    _connection.InvokeAsync("CreateDocument", docName, userName, newGuid);
+                    _connection.InvokeAsync(SignalRMethod.CreateDocument, docName, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -317,7 +317,7 @@ namespace SingleRClient
             {
                 try
                 {
-                    _connection.InvokeAsync("DeleteDocumentById", docId, userName, newGuid);
+                    _connection.InvokeAsync(SignalRMethod.DeleteDocumentById, docId, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -344,7 +344,7 @@ namespace SingleRClient
             {
                 try
                 {
-                    _connection.InvokeAsync("CreateShape", shape, userName, newGuid);
+                    _connection.InvokeAsync(SignalRMethod.CreateShape, shape, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -371,7 +371,7 @@ namespace SingleRClient
             {
                 try
                 {
-                    _connection.InvokeAsync("UpdateShape", shape, userName, newGuid);
+                    _connection.InvokeAsync(SignalRMethod.UpdateShape, shape, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -398,7 +398,7 @@ namespace SingleRClient
             {
                 try
                 {
-                    _connection.InvokeAsync("DeleteShape", shape, userName, newGuid);
+                    _connection.InvokeAsync(SignalRMethod.DeleteShape, shape, userName, newGuid);
                 }
                 catch (Exception ex)
                 {
@@ -464,7 +464,7 @@ namespace SingleRClient
 
         private void RegisterFunctions()
         {
-            _connection.On<DocumentList, string, Guid>("GetListDocuments", (list, userName, guid) =>
+            _connection.On<DocumentList, string, Guid>(SignalRMethod.GetListDocuments, (list, userName, guid) =>
             {
                 try
                 {
@@ -479,7 +479,7 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<Protocol.Common.Document, string, Guid>("GetDocumentById", (doc, userName, guid) =>
+            _connection.On<Protocol.Common.Document, string, Guid>(SignalRMethod.GetDocumentById, (doc, userName, guid) =>
             {
                 try
                 {
@@ -494,7 +494,7 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<Protocol.Common.Document, StatusResponse, Guid>("CreateDocument", (document, status, guid) =>
+            _connection.On<Protocol.Common.Document, StatusResponse, Guid>(SignalRMethod.CreateDocument, (document, status, guid) =>
             {
                 try
                 {
@@ -512,7 +512,7 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<StatusResponse, string, Guid>("DeleteDocumentById", (status, userName, guid) =>
+            _connection.On<StatusResponse, string, Guid>(SignalRMethod.DeleteDocumentById, (status, userName, guid) =>
             {
                 try
                 {
@@ -530,7 +530,7 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<Shape, StatusResponse, Guid>("CreateShape", (shape, status, guid) =>
+            _connection.On<Shape, StatusResponse, Guid>(SignalRMethod.CreateShape, (shape, status, guid) =>
             {
                 try
                 {
@@ -548,7 +548,7 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<Shape, StatusResponse, Guid>("UpdateShape", (shape, status, guid) =>
+            _connection.On<Shape, StatusResponse, Guid>(SignalRMethod.UpdateShape, (shape, status, guid) =>
             {
                 try
                 {
@@ -566,7 +566,7 @@ namespace SingleRClient
                 }
             });
 
-            _connection.On<Shape, StatusResponse, Guid>("DeleteShape", (shape, status, guid) =>
+            _connection.On<Shape, StatusResponse, Guid>(SignalRMethod.DeleteShape, (shape, status, guid) =>
             {
                 try
                 {
